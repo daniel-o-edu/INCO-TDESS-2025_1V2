@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aula 02 - Elementos de um Sistema IoT</title>
+<style>
+ body {
+ margin: 0; 
+ padding: 0; 
+ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+ background-color: #f8f9fa; 
+ color: #212529;
+ display: flex; 
+ flex-direction: column; 
+ height: 100vh;
+ overflow: hidden;
+ }
+ .slide-container {
+ width: 95vw;
+ height: 85vh;
+ margin: auto;
+ display: flex; 
+ align-items: center; 
+ justify-content: center;
+ padding: 20px; 
+ box-sizing: border-box; 
+ position: relative;
+ }
+ .slide {
+ display: none; 
+ width: 100%; 
+ max-width: 1200px; 
+ height: 80vh;
+ background: #ffffff; 
+ border-radius: 12px;
+ box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+ padding: 50px;
+ font-size: 24px; 
+ line-height: 1.5; 
+ overflow-y: auto;
+ }
+ .slide.active { 
+ display: block; 
+ animation: fadeIn 0.4s ease-in-out;
+ }
+ @keyframes fadeIn {
+ from { opacity: 0; transform: translateY(10px); }
+ to { opacity: 1; transform: translateY(0); }
+ }
+ h1, h2, h3, h4 { 
+ color: #0d6efd; 
+ margin-top: 0; 
+ }
+ code, pre { 
+ background: #e9ecef; 
+ padding: 10px 15px; 
+ border-radius: 8px; 
+ font-family: 'Courier New', Courier, monospace; 
+ display: block; 
+ font-size: 20px;
+ overflow-x: auto;
+ white-space: pre-wrap;
+ }
+ .controls {
+ height: 80px; 
+ background: #ffffff; 
+ border-top: 1px solid #dee2e6;
+ display: flex; 
+ justify-content: space-between; 
+ align-items: center; 
+ padding: 0 50px;
+ }
+ button {
+ background: #0d6efd; 
+ color: white; 
+ border: none; 
+ padding: 12px 25px;
+ font-size: 18px; 
+ border-radius: 8px; 
+ cursor: pointer;
+ transition: background 0.2s;
+ }
+ button:hover {
+ background: #0b5ed7;
+ }
+ button:disabled { 
+ background: #adb5bd; 
+ cursor: not-allowed; 
+ }
+ .progress { 
+ font-size: 20px; 
+ font-weight: bold; 
+ color: #495057;
+ }
+ .slide-label { font-weight: bold; text-transform: uppercase; color: #6c757d; margin-bottom: 20px; font-size: 18px; letter-spacing: 1px; }
+ .callout { padding: 20px 30px; border-radius: 8px; margin: 20px 0; border-left: 8px solid; }
+ .callout.blue { background: #cce5ff; border-color: #004085; color: #004085; }
+ .callout.green { background: #d4edda; border-color: #155724; color: #155724; }
+ .callout.red { background: #f8d7da; border-color: #721c24; color: #721c24; }
+ .callout.yellow { background: #fff3cd; border-color: #856404; color: #856404; }
+ .section-header { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; }
+ .section-num { font-size: 80px; font-weight: bold; color: #e9ecef; margin-bottom: -20px; }
+ .section-header h2 { font-size: 48px; color: #0d6efd; margin-bottom: 20px; }
+ img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; border: 1px solid #dee2e6; }
+ table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 20px; }
+ th, td { border: 1px solid #dee2e6; padding: 12px; text-align: left; }
+ th { background-color: #e9ecef; color: #0d6efd; }
+</style>
+</head>
+<body>
+ <div class="slide-container" id="slides">
+
+ <div class="slide active">
+ <div class="slide-label">Aula 02</div>
+ <h1>Aula 02 - Elementos de um Sistema IoT</h1>
+ <p><strong>Descrição:</strong> Estudo dos elementos que compõem um sistema IoT: dispositivos, conectividade, dados e processamento.</p>
+ </div>
+ 
+ <div class="slide">
+ <div class="section-header">
+ <div class="section-num">01</div>
+ <h2>1. Camada do Mundo Físico: Sensoriamento e Atuação</h2>
+ </div>
+ </div>
+
+ <div class="slide">
+ <h2>1. Camada do Mundo Físico: Sensoriamento e Atuação</h2>
+ <p>Esta camada é a porta de entrada e saída do sistema, responsável por traduzir grandezas físicas em sinais elétricos (sensoriamento) e ações mecânicas ou térmicas de volta ao ambiente (atuação).</p>
+ <h2>1.1 Sensores (Entrada de Dados)</h2>
+ <p>Os sensores são dispositivos essenciais que detectam fenômenos físicos ou químicos no ambiente — como temperatura, luminosidade, pressão e movimento — e os convertem em sinais elétricos legíveis por microcontroladores e computadores. Eles atuam como a "porta de entrada" dos dados no mundo digital, viabilizando o monitoramento em tempo real, a automação industrial e o funcionamento de redes de Internet das Coisas (IoT).</p>
+ </div>
+
+ <div class="slide">
+ <h2>Aspectos Fundamentais dos Sensores</h2>
+ <ul>
+ <li><strong>Natureza do Sinal:</strong> Podem gerar saídas <strong>analógicas</strong> (variações contínuas de tensão ou resistência) ou <strong>digitais</strong> (dados codificados diretamente em bits).</li>
+ <li><strong>Tratamento do Sinal:</strong> Sinais analógicos dependem de conversores analógico-digitais (ADC) e circuitos de condicionamento (como divisores de tensão) para serem processados.</li>
+ <li><strong>Exemplos Clássicos:</strong> Fotorresistores de luz (LDR), medidores de distância por ondas sonoras (ultrassônicos) e sensores de temperatura (analógicos como o LM35 ou digitais como o DS18B20).</li>
+ <li><strong>Papel na IoT:</strong> Formam a base da camada do mundo físico, capturando eventos do ambiente real para alimentar a tomada de decisão em sistemas inteligentes.</li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>Tipos de sensores</h2>
+ <ul>
+ <li><strong>LDR (Light Dependent Resistor):</strong> É um fotorresistor feito de sulfeto de cádmio (CdS). Na ausência de luz (fótons), apresenta uma resistência elétrica muito alta (centenas de kΩ); sob iluminação, os elétrons são liberados e sua resistência cai drasticamente. Para ler essa variação no Arduino, monta-se um circuito <strong>divisor de tensão</strong> com um resistor fixo (normalmente de 10 ㏀) para gerar uma tensão de saída (Vout) proporcional à luminosidade.</li>
+ <li><strong>Sensor Ultrassônico (HC-SR04):</strong> Usado para medição de distância de precisão (limite prático de 2 cm a 200 cm). O processador local envia um pulso elétrico no pino <em>Trigger</em> por <strong>10 microssegundos</strong>, disparando a emissão de <strong>8 pulsos sonoros de 40 kHz</strong>. O pino <em>Echo</em> entra em nível alto (HIGH) e o microcontrolador mede em microssegundos o tempo decorrido até o sinal sonoro retornar ao receptor. A distância em centímetros é calculada usando a velocidade do som no ar (≈340 m/s), resultando na fórmula de calibração: <em>distância = duração / 58</em>.</li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>Tipos de sensores (Continuação)</h2>
+ <ul>
+ <li><strong>Sensores de Temperatura:</strong>
+ <ul>
+ <li><strong>LM35 (Analógico):</strong> Fornece uma tensão de saída linearmente proporcional à temperatura em Celsius (10mV/ºC). Em bancada, para otimizar a resolução da leitura analógica no conversor ADC de 10 bits do Arduino (0 a 1023), pode-se configurar a <strong>voltagem de referência interna</strong> de 1,1V <i>(analogReference(INTERNAL)</i>), o que eleva a precisão do cálculo de conversão, já que a escala de leitura se adequa à faixa de saída máxima do LM35.</li>
+ <li><strong>DS18B20 (Digital):</strong> Comunica-se por protocolo <strong>1-Wire (1 Fio)</strong>, permitindo que vários sensores de temperatura sejam ligados em cascata (encadeados) sob um único pino digital do microcontrolador. Cada sensor possui um código de identificação de hardware (ID) de 64 bits único de fábrica. Sua resolução é configurável de 9 a 12 bits, variando o tempo de conversão de 93,75 ms a 750 ms.</li>
+ </ul>
+ </li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>1.2 Atuadores (Saída de Ação)</h2>
+ <p>Os atuadores são componentes que convertem sinais lógicos ou elétricos em ações mecânicas, magnéticas ou outras formas de energia no ambiente físico. Eles representam a camada de saída de um sistema IoT, permitindo que as decisões do microcontrolador executem modificações diretas no mundo real.</p>
+ <h3>Aspectos Fundamentais dos Atuadores</h3>
+ <ul>
+ <li><strong>Transformação de Energia:</strong> Convertem a inteligência de software em trabalho físico, como rotação, deslocamento ou geração de torque.</li>
+ <li><strong>Interface e Amplificação de Potência:</strong> Como costumam exigir correntes elevadas (frequentemente 500 mA ou mais), não podem ser alimentados diretamente pelas portas do microcontrolador (limitadas a 40 mA), necessitando de transistores ou drivers intermediários.</li>
+ <li><strong>Exemplos Clássicos:</strong> Motores de corrente contínua (CC) para rotação contínua, Pontes H para controle de sentido/velocidade e servomotores para posicionamento angular preciso.</li>
+ <li><strong>Papel na IoT:</strong> Fecham a malha de controle do sistema, transformando os dados capturados pelos sensores e processados na borda em ações práticas e automatizadas no ambiente.</li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>Tipos de Atuadores</h2>
+ <ul>
+ <li><strong>Motores de Corrente Contínua (CC):</strong> Motores de CC exigem correntes elétricas elevadas para operar (geralmente de 500 mA ou mais). Como as portas digitais do Arduino fornecem uma corrente limite de segurança de apenas <strong>40 mA por pino</strong>, tentar conectar um motor diretamente à porta causará danos permanentes ao chip. Para isolar e amplificar a corrente, empregam-se <strong>transistores bipolares NPN (como TIP120, BD135, BD137 ou BD139)</strong> atuando como chaves eletrônicas acionadas pelas portas do Arduino.</li>
+ <li><strong>Pontes H (Drivers Integrados):</strong> Para controlar a velocidade e a rotação bidirecional de motores CC, utilizam-se circuitos de Ponte H. CIs populares como o <strong>L293D ou o SN754410</strong> encapsulam pontes H duplas e possuem diodos internos de proteção contra surtos eletromagnéticos reversos (força eletromotriz inversa) gerados pelas bobinas indutivas dos motores ao serem desligados.</li>
+ <li><strong>Servomotores:</strong> Contêm em um único bloco um motor CC, engrenagens, um potenciômetro de feedback de posição e um circuito de controle. Eles posicionam o seu braço de saída em ângulos específicos (geralmente até 180º, respondendo a sinais modulados por largura de pulso.</li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>1.3 Condicionamento de Sinais, Qualidade e Segurança de Bancada</h2>
+ <p>O condicionamento de sinais e a segurança de bancada garantem a integridade dos circuitos eletrônicos e a confiabilidade das leituras em um sistema embarcado. Essas práticas eliminam ruídos elétricos, estabilizam estados lógicos e protegem os microcontroladores contra surtos de tensão e sobreaquecimento.</p>
+ <p>Na montagem física em protoboard, o respeito às normas de qualidade evita a queima de componentes:</p>
+ <ul>
+ <li><strong>Resistores de Pull-up e Pull-down:</strong> Essenciais para chaves digitais e botões (<em>push-buttons</em>). Sem um resistor conectado à referência, o pino do microcontrolador fica em <strong>estado flutuante (floating)</strong>, captando ruídos eletromagnéticos do ar e gerando falsos acionamentos. O resistor de <em>pull-down</em> garante o nível lógico baixo (0 V) quando o botão está solto; ao pressioná-lo, a tensão vai para 5 V (HIGH). O Arduino possui resistores de <em>pull-up</em> internos (20 kΩ a 50 kΩ) que podem ser ativados via software (<i>pinMode(pino, INPUT_PULLUP)</i>).</li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>1.3 Condicionamento de Sinais (Continuação)</h2>
+ <ul>
+ <li><strong>Diodos de Proteção (como o 1N4001):</strong> Devem ser conectados em paralelo reverso com cargas indutivas (motores e relés) para proteger os transistores e o microcontrolador de picos de alta tensão gerados pelo desligamento da bobina.</li>
+ <li><strong>Dissipadores de Calor:</strong> Componentes como o L293D e transistores de potência aquecem significativamente sob cargas contínuas e exigem o uso de dissipadores metálicos térmicos para evitar falhas por sobreaquecimento.</li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <div class="section-header">
+ <div class="section-num">02</div>
+ <h2>2. Camada de Processamento Local: Microcontroladores e Programação Embarcada</h2>
+ </div>
+ </div>
+
+ <div class="slide">
+ <h2>2. Camada de Processamento Local</h2>
+ <p>Esta é a camada de <strong>Inteligência de Borda (Edge Computing)</strong>, onde o processamento local filtra, armazena temporariamente ou toma decisões rápidas próximas aos sensores para evitar tráfego de dados massivos e redundantes para a rede.</p>
+ <h3>2.1 O Microcontrolador (Hardware de Controle)</h3>
+ <p>Um microcontrolador é um sistema de computação em chip único (<em>system-on-a-chip</em>) composto por uma unidade central de processamento (CPU), memória RAM para variáveis de trabalho (volátil), memória Flash para gravação do código compilado (não volátil), EEPROM para dados persistentes de calibração que sobrevivem à falta de energia, e portas de Entrada/Saída (I/O):</p>
+ </div>
+
+ <div class="slide">
+ <h2>2.1 O Microcontrolador (Continuação)</h2>
+ <ul>
+ <li><strong>Arduino Uno (ATmega328):</strong> Possui CPU AVR de 8 bits, clock de 16 MHz, <strong>2 kB de memória SRAM</strong> (RAM estática), <strong>32 kB de memória Flash</strong> e 1 kB de EEPROM. É um hardware excelente para fins didáticos e controle básico de entradas e saídas digitais e analógicas.</li>
+ <li><strong>Arduino Mega 2560 (ATmega2560):</strong> Indicado para projetos complexos que exigem alta quantidade de conexões físicas. Dispõe de <strong>54 portas digitais</strong> (15 com suporte a PWM), <strong>16 entradas analógicas</strong>, 256 kB de memória Flash e 8 kB de SRAM.</li>
+ </ul>
+ </div>
+ 
+  <div class="slide">
+ <h2>2.1 O Microcontrolador (Continuação)</h2>
+ <li><strong>Classes de Dispositivos Limitados:</strong> Conforme a especificação IETF RFC 7228, o hardware de borda na IoT é categorizado por limitações de recursos elétricos e computacionais:
+ <ul>
+ <li><strong>Classe 0:</strong> Dispositivos altamente limitados (RAM &lt;&lt; 10 kB, Flash &lt;&lt; 100 kB), que não possuem capacidade para executar de forma nativa a pilha TCP/IP padrão, exigindo proxies ou gateways para se comunicarem na Internet.</li>
+ <li><strong>Classe 1:</strong> Dispositivos intermediários (RAM ≈ 10 kB, Flash ≈ 100 kB), capazes de rodar pilhas de protocolos altamente otimizados e comprimidos (como 6LoWPAN) sem o auxílio constante de um gateway.</li>
+ <li><strong>Classe 2:</strong> Dispositivos menos limitados (RAM ≈ 50 kB, Flash ≈ 250 kB), que executam a pilha IP padrão de forma completa.</li>
+ </ul>
+ </li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>2.2 Programação Embarcada na Prática</h2>
+ <p>Os sketches de microcontroladores são desenvolvidos em dialeto da linguagem C/C++. O desenvolvimento exige atenção restrita ao limite físico da memória do hardware:</p>
+ <ul>
+ <li><strong>Funções <i>setup()</i> e <i>loop()</i>:</strong> Essenciais em qualquer código embarcado. A função <i>setup()</i> é executada apenas uma vez ao iniciar o sistema para configurar estados dos pinos e portas; a função <i>loop()</i> executa as rotinas sequencialmente e infinitamente enquanto houver energia.</li>
+ <li><strong>Eficiência de Memória nos Tipos de Dados:</strong> No desenvolvimento embarcado, cada byte é valioso. Salvar o número de uma porta digital como int (inteiro) consome <strong>2 bytes</strong> na SRAM (faixa de -32.768 a 32.767). Como os pinos do Arduino Uno variam apenas de 0 a 13, economiza-se memória RAM declarando os pinos como tipo byte ou char (que consomem apenas <strong>1 byte</strong> e armazenam valores de 0 a 255).</li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>2.2 Programação Embarcada na Prática (Continuação)</h2>
+ <ul>
+ <li><strong>Função <i>millis()</i> versus <i>delay()</i>:</strong> A utilização da função <i>delay()</i> congela a execução da CPU do microcontrolador por milissegundos definidos. Em aplicações de IoT, onde o processador deve receber comandos pela porta serial, monitorar sensores em tempo real e atuar de forma concorrente, o congelamento por <i>delay()</i> inviabiliza o sistema. A alternativa correta é monitorar o tempo de processamento por meio da função <i>millis()</i>, que retorna um inteiro longo sem sinal (unsigned long, de 4 bytes) que armazena os milissegundos transcorridos desde que a placa foi ligada. O estado do sensor ou das transmissões de rede é então verificado comparando-se marcas temporais de processamento sem pausar a CPU.</li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <div class="section-header">
+ <div class="section-num">03</div>
+ <h2>3. Camada de Conectividade de Hardware e Infraestrutura de Redes</h2>
+ </div>
+ </div>
+
+ <div class="slide">
+ <h2>3. Camada de Conectividade</h2>
+ <p>A conectividade é o sistema vascular da IoT, transportando informações entre os dispositivos inteligentes de borda, gateways e servidores centrais.</p>
+ <h3>3.1 Tecnologias de Hardware Sem Fio (Alcance e Aplicação)</h3>
+ <ul>
+ <li><strong>IEEE 802.15.4 (ZigBee):</strong> Tecnologia sem fio focada em baixo consumo de energia, baixa complexidade e custo acessível de hardware. Opera prioritariamente nas faixas ISM (frequência livre) de 2,4 GHz, 915 MHz (Américas) e 868 MHz (Europa), com taxas de vazão de até 250 kbps. Suporta redes em topologia estrela, árvore de clusters ou malha (mesh), sendo ideal para redes de sensores pessoais ou industriais locais (WPANs).</li>
+ <li><strong>Bluetooth Low Energy (BLE):</strong> Diferente do Bluetooth clássico (focado em taxas de vazão elevadas para áudio e arquivos), o BLE (Bluetooth 4.0 ou superior) é otimizado para baixíssimo consumo, operando por longos meses com pequenas baterias em formato de moeda. Tem excelente penetração em dispositivos móveis modernos (smartphones e tablets) e suporta topologias estrela e mesh.</li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>3.1 Tecnologias de Hardware Sem Fio (Continuação)</h2>
+ <ul>
+ <li><strong>LoRaWAN (Low Power Wide Area Network):</strong> Tecnologia de LPWAN projetada para dispositivos de baixo consumo que se comunicam a longas distâncias. Utiliza modulação por espalhamento espectral de chirp (Chirp Spread Spectrum), oferecendo uma sensibilidade de rádio impressionante e alto orçamento de link (<em>link budget</em>). Consegue penetrar paredes e atingir alcances práticos de 2 a 5 km em regiões urbanas densas e até 45 km em áreas rurais de visada direta, com taxas de transmissão de 300 bps a 50 kbps.</li>
+ <li><strong>Wi-Fi (IEEE 802.11):</strong> Solução tradicional baseada em alta taxa de transferência (vazão de megabits a gigabits) e longo alcance em redes locais de topologia estrela. A desvantagem principal reside em seu consumo energético altíssimo, o que inviabiliza seu uso em sensores de IoT de campo alimentados por baterias. O padrão recente <strong>IEEE 802.11ah (Wi-Fi HaLow)</strong>, operando abaixo de 1 GHz, visa contornar essa falha oferecendo comunicação de baixo consumo e longo alcance para IoT.</li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>3.2 Redes de Computadores e a Pilha IP</h2>
+ <ul>
+ <li><strong>Adaptação com 6LoWPAN:</strong> O protocolo IPv6 padrão, com seu endereçamento de 128 bits e cabeçalho base de 40 bytes, é muito pesado para quadros de transmissão de redes limitadas (como o limite físico de carga de 127 bytes do IEEE 802.15.4). A camada de adaptação <strong>6LoWPAN</strong> atua entre a camada física/enlace e a camada de rede IP para realizar a compressão inteligente de cabeçalhos IPv6, fragmentação e montagem de pacotes, e encaminhamento l2 (<em>mesh under</em>), permitindo que dispositivos de Classe 1 acessem a Internet nativamente.</li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>3.2 Redes de Computadores e a Pilha IP (Continuação)</h2>
+ <ul>
+ <li><strong>Roteamento com RPL:</strong> O RPL (<em>Routing Protocol for Low-Power and Lossy Networks</em>) é o protocolo padrão da IETF de vetor de distância para rotear mensagens em redes IPv6 instáveis e limitadas (LLNs).
+ <ul>
+ <li>O RPL cria uma árvore de roteamento dinâmica chamada <strong>DODAG</strong> (<em>Destination-Oriented Directed Acyclic Graph</em>) que converge para o roteador de borda (raiz).</li>
+ <li>Utiliza mensagens <strong>DIO</strong> (<em>DODAG Information Object</em>) emitidas pela raiz e nós pais para propagar informações de conexão e classificar a distância lógica de cada dispositivo em relação à raiz através do cálculo do <strong>Rank</strong>.</li>
+ <li>Mensagens <strong>DIS</strong> (<em>DODAG Information Solicitation</em>) são usadas de forma ativa por nós que se ligaram recentemente para descobrir redes vizinhas ativas.</li>
+ <li>Mensagens <strong>DAO</strong> (<em>DODAG Advertisement Object</em>) são enviadas pelos nós das folhas em direção ascendente (para os pais) para informar as rotas e construir as tabelas de roteamento descendentes na árvore, viabilizando o tráfego bidirecional ponto-a-ponto.</li>
+ </ul>
+ </li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <div class="section-header">
+ <div class="section-num">04</div>
+ <h2>4. Camada de Software, Protocolos e Integração Web</h2>
+ </div>
+ </div>
+
+ <div class="slide">
+ <h2>4. Camada de Software</h2>
+ <p>Esta camada é a ponte que integra o dado gerado na borda à nuvem e aos servidores, permitindo que a inteligência de negócios consuma os dados de sensores de forma amigável.</p>
+ <h3>4.1 Protocolos de Aplicação IoT</h3>
+ <p>As aplicações tradicionais da Web usam o protocolo HTTP sobre conexões TCP. No entanto, a sobrecarga de mensagens necessárias para estabelecer uma conexão TCP síncrona (com o handshake de três vias) torna o HTTP ineficiente para dispositivos limitados e links de comunicação sujeitos a perdas. Os protocolos de aplicação de IoT são projetados para serem extremamente leves:</p>
+ </div>
+
+ <div class="slide">
+ <h2>4.1 Protocolos de Aplicação IoT (Continuação)</h2>
+ <ul>
+ <li><strong>CoAP (Constrained Application Protocol):</strong> É um protocolo de comunicação binário e assíncrono desenvolvido pela IETF. Ele adota a arquitetura <strong>RESTful</strong> (fazendo uso de requisições GET, POST, PUT, DELETE sobre URIs), mas executa de forma muito mais leve sobre o protocolo de transporte de datagramas <strong>UDP</strong>, eliminando a necessidade de handshakes complexos do TCP. O CoAP possui um recurso nativo chamado <strong>Observe</strong>, no qual um cliente pode registrar seu interesse em uma URI do sensor e o servidor CoAP envia notificações automáticas apenas quando houver mudanças no estado físico, poupando largura de banda.</li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>4.1 Protocolos de Aplicação IoT (Continuação)</h2>
+ <ul>
+ <li><strong>MQTT (Message Queue Telemetry Transport):</strong> É um protocolo binário leve que segue a arquitetura de <strong>Publicação/Assinatura (Publish/Subscribe)</strong> e executa sobre o transporte TCP para garantir entrega e ordenamento de mensagens. A comunicação é totalmente mediada por um servidor central chamado <strong>Broker</strong>:
+ <ul>
+ <li>Os <strong>Publishers</strong> (como microcontroladores conectados a sensores) publicam dados sob um endereço estruturado de tópicos (por exemplo, <i>casa/quarto/temperatura</i>).</li>
+ <li>Os <strong>Subscribers</strong> (como dashboards ou bancos de dados na nuvem) assinam os tópicos de interesse.</li>
+ <li>O <strong>Broker</strong> gerencia as conexões, filtra as mensagens por tópicos e distribui os dados aos assinantes de forma rápida e assíncrona, desacoplando o emissor do receptor.</li>
+ </ul>
+ </li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>4.2 oneM2M e ETSI M2M (Padrões de Integração e Abstração)</h2>
+ <p>O desenvolvimento clássico de sistemas IoT sofre com o acoplamento excessivo de software com o hardware proprietário. Substituir um sensor danificado de um fabricante por outro exige a reescrita do código da aplicação, gerando alto custo operacional.</p>
+ <p>Os consórcios de padronização criaram middlewares de abstração para viabilizar o modelo "qualquer aplicação se comunica com qualquer dispositivo":</p>
+ <ul>
+ <li>O padrão <strong>oneM2M</strong> propõe uma arquitetura que define a <strong>Common Services Entity (CSE)</strong>. A CSE funciona como uma camada de software intermediária (<em>middleware</em>) que roda em servidores na nuvem, gateways e dispositivos robustos, provendo funções comuns padronizadas de gerenciamento de dados, descriptografia e segurança, descoberta de recursos físicos e lógica de gerenciamento de hardware por meio de APIs abstratas e padronizadas, reduzindo a complexidade de desenvolvimento de soluções IoT de ponta a ponta.</li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <div class="section-header">
+ <div class="section-num">05</div>
+ <h2>Atividade de Pesquisa Complementar</h2>
+ </div>
+ </div>
+
+ <div class="slide">
+ <h2>Atividade de Pesquisa Complementar</h2>
+ <p><strong>Título:</strong> <em>Dimensionamento de Arquitetura IoT para Cenários de Aplicação Real</em></p>
+ <p><strong>Objetivo:</strong> Aplicar os conceitos das quatro camadas apresentadas na aula para projetar a infraestrutura técnica de uma solução de IoT viável mercado.</p>
+ <h3>Roteiro da Atividade:</h3>
+ <p>1. <strong>Escolha de um Cenário Prático:</strong><br>
+ Individual (ou dupla) deve selecionar <strong>um</strong> dos cenários abaixo:</p>
+ <ul>
+ <li><em><strong>Agrotech</strong></em>: Monitoramento de umidade do solo e acionamento de irrigação em fazendas conectadas.</li>
+ <li><em><strong>Cidades Inteligentes</strong></em>: Gestão de iluminação pública e detecção de vagas em estacionamentos.</li>
+ <li><em><strong>Indústria 4.0</strong></em>: Preditiva de falhas por temperatura e vibração em motores de esteiras fabris.</li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>Atividade de Pesquisa Complementar (Continuação)</h2>
+ <p>2. <strong>Mapeamento das 4 Camadas:</strong></p>
+ <ul>
+ <li><strong>Camada Física:</strong> Selecionar sensores e atuadores para o cenário. Indicar quais circuitos de proteção ou condicionamento (e.g., diodos, <em>pull-up/down</em>, divisores) serão necessários.</li>
+ <li><strong>Processamento na Borda:</strong> Definir a classe do dispositivo conforme a RFC 7228 (Classe 0, 1 ou 2) e explicar como a lógica de código evita travamentos da CPU usando temporização assíncrona.</li>
+ <li><strong>Conectividade:</strong> Comparar duas tecnologias de rede (ex.: LoRaWAN vs BLE ou ZigBee vs Wi-Fi) avaliando raio de alcance, autonomia de bateria e topologia de rede.</li>
+ <li><strong>Aplicação e Software:</strong> Escolher entre MQTT e CoAP, justificando a decisão com base na camada de transporte (TCP vs UDP) e desenhando a estrutura do tópico ou URI dos dados.</li>
+ </ul>
+ <p>3. <strong>Entregável:</strong><br>
+ Relatório técnico (2 a 3 páginas) contendo o diagrama de blocos das 4 camadas e uma matriz comparativa com as justificativas técnicas das escolhas adotadas.</p>
+ </div>
+
+ </div>
+
+ <div class="controls">
+ <button id="prevBtn" onclick="prevSlide()" disabled>Anterior</button>
+ <div class="progress"><span id="current">1</span> / <span id="total"></span></div>
+ <button id="nextBtn" onclick="nextSlide()">Próximo</button>
+ </div>
+
+ <script>
+ let currentSlideIndex = 0;
+ const slides = document.querySelectorAll('.slide');
+ const totalSlides = slides.length;
+ const currentIndicator = document.getElementById('current');
+ const totalIndicator = document.getElementById('total');
+ const prevBtn = document.getElementById('prevBtn');
+ const nextBtn = document.getElementById('nextBtn');
+
+ totalIndicator.textContent = totalSlides;
+
+ function updateView() {
+ slides.forEach((slide, index) => {
+ slide.classList.remove('active');
+ if (index === currentSlideIndex) {
+ slide.classList.add('active');
+ }
+ });
+ currentIndicator.textContent = currentSlideIndex + 1;
+ 
+ prevBtn.disabled = currentSlideIndex === 0;
+ nextBtn.disabled = currentSlideIndex === totalSlides - 1;
+ }
+
+ function nextSlide() {
+ if (currentSlideIndex < totalSlides - 1) {
+ currentSlideIndex++;
+ updateView();
+ }
+ }
+
+ function prevSlide() {
+ if (currentSlideIndex > 0) {
+ currentSlideIndex--;
+ updateView();
+ }
+ }
+
+ document.addEventListener('keydown', (e) => {
+ if (e.key === 'ArrowRight' || e.key === 'PageDown') nextSlide();
+ if (e.key === 'ArrowLeft' || e.key === 'PageUp') prevSlide();
+ });
+ </script>
+</body>
+</html>
