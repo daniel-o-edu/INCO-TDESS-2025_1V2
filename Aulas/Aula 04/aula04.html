@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aula 04 - Robótica, Sensores e Atuadores</title>
+  <style>
+    :root {
+      --bg-color: #f4f6f9;
+      --card-bg: #ffffff;
+      --text-color: #1a202c;
+      --text-muted: #4a5568;
+      --accent-color: #2b6cb0;
+      --border-color: #e2e8f0;
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .slide-container {
+      width: 100%;
+      max-width: 1100px;
+      min-height: 650px;
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 40px;
+      position: relative;
+      overflow-y: auto;
+    }
+
+    .slide {
+      display: none;
+      flex-direction: column;
+      gap: 20px;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .slide.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      color: var(--accent-color);
+      line-height: 1.2;
+      border-bottom: 3px solid var(--accent-color);
+      padding-bottom: 10px;
+    }
+
+    h2 {
+      font-size: 1.6rem;
+      color: var(--text-color);
+      margin-top: 10px;
+    }
+
+    h3 {
+      font-size: 1.3rem;
+      color: var(--accent-color);
+    }
+
+    p, li {
+      font-size: 1.15rem;
+      color: var(--text-color);
+      line-height: 1.6;
+    }
+
+    ul, ol {
+      padding-left: 25px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .highlight-box {
+      background-color: #ebf8ff;
+      border-left: 4px solid var(--accent-color);
+      padding: 15px 20px;
+      border-radius: 4px;
+      font-size: 1.1rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 1rem;
+    }
+
+    th, td {
+      border: 1px solid var(--border-color);
+      padding: 12px 15px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #edf2f7;
+      color: var(--text-color);
+      font-weight: bold;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 30px;
+      padding-top: 15px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .btn {
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn:hover {
+      background-color: #2c5282;
+    }
+
+    .btn:disabled {
+      background-color: #cbd5e0;
+      cursor: not-allowed;
+    }
+
+    .slide-counter {
+      font-size: 1rem;
+      font-weight: bold;
+      color: var(--text-muted);
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
+      .slide-container {
+        padding: 20px;
+        min-height: 80vh;
+      }
+
+      h1 { font-size: 1.6rem; }
+      h2 { font-size: 1.3rem; }
+      h3 { font-size: 1.1rem; }
+      p, li { font-size: 1rem; }
+
+      table, th, td {
+        font-size: 0.85rem;
+        padding: 8px;
+      }
+
+      .btn {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="slide-container">
+    
+    <!-- SLIDE 1 -->
+    <div class="slide active">
+      <h1>Aula 04 - Robótica, Sensores e Atuadores</h1>
+      <div class="highlight-box">
+        <strong>Descrição:</strong> Conceitos de sensoriamento, condicionamento de sinal e atuadores industriais aplicados à IoT.
+      </div>
+      <p>Esta proposta foi estruturada para conduzir os estudantes através do <strong>fluxo completo de conversão energética e de dados</strong>: desde o fenômeno físico do ambiente (sensoriamento), passando pela adequação elétrica e digital da informação (condicionamento de sinal), até a resposta física de volta ao ambiente (atuação local e industrial).</p>
+      <p>O objetivo é capacitar o estudante a entender as limitações de hardware, projetar circuitos de acoplamento seguros e escolher as tecnologias de atuação mais adequadas para aplicações residenciais, robóticas e industriais de Internet das Coisas.</p>
+    </div>
+
+    <!-- SLIDE 2 -->
+    <div class="slide">
+      <h1>Tópico 1: Conceitos de Sensoriamento (Transdutores de Entrada)</h1>
+      <p>Um <strong>sensor</strong> é um dispositivo projetado para detectar eventos ou variações em seu ambiente físico (como luz, calor, som, pressão e movimento) e convertê-los em uma grandeza elétrica correspondente, servindo como a interface analógica do sistema com o mundo real. A transdução de entrada traduz os fenômenos do mundo analógico em sinais que os dispositivos de computação e comunicação conseguem interpretar.</p>
+      <p>Nesta aula, serão analisados os seguintes sensores-chave de mercado e de desenvolvimento:</p>
+      <ul>
+        <li><strong>LDR (Light Dependent Resistor):</strong> Sensor resistivo cuja resistência elétrica varia de forma inversamente proporcional à intensidade de luz solar ou artificial que incide sobre sua superfície de sulfeto de cádmio. Em ambientes escuros, apresenta uma resistência extremamente alta (centenas de kΩ); sob luz direta (fótons), os elétrons livres são liberados e sua resistência elétrica cai drasticamente para valores baixos.</li>
+      </ul>
+    </div>
+
+    <!-- SLIDE 3 -->
+    <div class="slide">
+      <h1>Tópico 1: Conceitos de Sensoriamento (Cont.)</h1>
+      <ul>
+        <li><strong>LM35 (Sensor de Temperatura Analógico):</strong> Sensor de circuito integrado que fornece uma tensão de saída analógica com comportamento linear e escala diretamente proporcional à temperatura em graus Celsius (10 mV/ºC). Opera de forma estável com alta precisão e possui baixo custo de implementação.</li>
+        <li><strong>DHT-11 (Sensor Digital de Temperatura e Umidade):</strong> Módulo digital integrado que realiza a leitura analógica interna da umidade relativa do ar (por capacitância) e da temperatura, entregando ao microcontrolador um sinal digital codificado.</li>
+        <li><strong>DS18B20 (Sensor Digital de Temperatura 1-Wire):</strong> Termômetro digital de alta precisão que utiliza o protocolo <strong>1-Wire (1 Fio)</strong>. Ele permite a conexão de múltiplos sensores em cascata utilizando uma única linha de dados digital do processador. Isso é possível porque cada sensor vem gravado de fábrica com um código de identificação único (ID) de 64 bits.</li>
+      </ul>
+    </div>
+
+    <!-- SLIDE 4 -->
+    <div class="slide">
+      <h1>Tópico 1: Conceitos de Sensoriamento (Cont.)</h1>
+      <ul>
+        <li><strong>HC-SR04 (Telêmetro Ultrassônico de Distância):</strong> Utiliza ondas sonoras de alta frequência para calcular a distância física até um obstáculo através do princípio de <strong>tempo de voo (time-of-flight)</strong> ou SONAR. O sensor dispara pulsos sonoros inaudíveis de <strong>40 kHz</strong> por meio de um emissor e conta em microssegundos o intervalo de tempo decorrido até que o eco retorne ao receptor. A fórmula de calibração física baseia-se na velocidade do som no ar (≈340 m/s), resultando em distância (cm) = duração do pulso (ms) / 58.</li>
+        <li><strong>TCRT5000 (Sensor Óptico Reflexivo):</strong> Composto por um diodo emissor (LED) de luz infravermelha e um fototransistor receptor dispostos lado a lado. Quando um obstáculo se aproxima, a luz infravermelha reflete nele e satura a junção do fototransistor, alterando o nível lógico de saída do pino do sensor de alto para baixo. É muito utilizado em interruptores de proximidade e em robôs seguidores de linha.</li>
+      </ul>
+    </div>
+
+    <!-- SLIDE 5 -->
+    <div class="slide">
+      <h1>Tópico 2: Condicionamento de Sinais (Signal Conditioning)</h1>
+      <p>A camada de condicionamento de sinais atua como a interface de adequação elétrica, proteção de hardware e pré-processamento de dados entre os fenômenos analógicos e a lógica digital do microcontrolador. Como a maioria dos sensores entrega grandezas elétricas brutas — como variações resistivas ou sinais de baixíssima amplitude —, o sinal exige conversão, filtragem e compatibilização antes de ser processado.</p>
+      <ul>
+        <li><strong>Divisores de Tensão (Voltage Dividers):</strong> Essenciais para traduzir a variação de resistência de sensores resistivos (como o LDR ou potenciômetros) em variações de tensão legíveis por portas analógicas. O divisor de tensão associa o sensor a um resistor de valor fixo calibrado (tipicamente 1 kΩ a 10 kΩ) sob uma tensão de entrada estável (Vin). A tensão medida na junção dos dois componentes (Vout) obedece à equação de proporção: <br><br>
+        <div style="text-align: center; font-weight: bold; font-size: 1.2rem;">Vout = (R2 / (R1 + R2)) × Vin</div></li>
+      </ul>
+    </div>
+
+    <!-- SLIDE 6 -->
+    <div class="slide">
+      <h1>Tópico 2: Condicionamento de Sinais (Cont.)</h1>
+      <ul>
+        <li><strong>Otimização de Resolução e Referência do ADC (Conversor Analógico-Digital):</strong> O ADC integrado de microcontroladores (como o ATmega328 do Arduino Uno, que possui resolução de 10 bits) mapeia tensões analógicas de 0 a 5 V em valores digitais discretos de 0 a 1023. Se medirmos um sensor como o LM35 (cuja saída máxima em 100ºC é de apenas 1 V), usar a referência padrão de 5 V desperdiça cerca de 80% da resolução disponível do conversor. Para contornar essa limitação, aplica-se via software a configuração de <strong>voltagem de referência interna</strong> (como a referência interna de 1,1 V do ATmega328), reduzindo a escala total de leitura para 1,1 V e aumentando drasticamente a precisão da amostragem em milivolts.</li>
+      </ul>
+    </div>
+
+    <!-- SLIDE 7 -->
+    <div class="slide">
+      <h1>Tópico 2: Condicionamento de Sinais (Cont.)</h1>
+      <ul>
+        <li><strong>Filtros de Software (Média Móvel ou Running Average):</strong> Para mitigar ruídos térmicos, oscilações elétricas bruscas ou ruídos de leitura de sensores (como bouncings em chaves físicas ou picos transitórios em leituras ultrassônicas), utilizam-se algoritmos que capturam um conjunto de amostras sequenciais, realizam a soma acumulada e extraem uma média matemática estável antes de enviar o dado final à camada de tomada de decisão.</li>
+        <li><strong>Conversão de Nível Lógico:</strong> Muitos módulos eletrônicos de IoT de alto desempenho operam estritamente sob nível lógico de 3,3 V (como cartões SD e o chip de pressão SCP1000). Para conectá-los de forma segura a microcontroladores de 5 V sem queimar os barramentos de recepção de dados, criam-se divisores de tensão resistivos dedicados nas linhas digitais (como MOSI, SCK e SS da interface SPI) para rebaixar os níveis lógicos de 5 V para 3,3 V.</li>
+      </ul>
+    </div>
+
+    <!-- SLIDE 8 -->
+    <div class="slide">
+      <h1>Tópico 3: Atuadores e Acoplamentos Industriais</h1>
+      <p>Um <strong>atuador</strong> é um dispositivo elétrico, mecânico, hidráulico ou pneumático responsável por converter comandos lógicos, dados digitais ou fontes de energia externa em movimento ou ação física para governar e modificar o estado do ambiente real.</p>
+      <h2>3.1 Acoplamento e Proteção Elétrica</h2>
+      <ul>
+        <li><strong>Limitação de Corrente das Portas de Controle:</strong> Microcontroladores operam com correntes muito baixas. No Arduino Uno, por exemplo, o limite seguro absoluto de corrente que uma porta digital pode fornecer continuamente é de apenas <strong>40 mA</strong>. Motores e bobinas exigem potências e correntes elétricas substancialmente mais elevadas (tipicamente acima de 500 mA).</li>
+      </ul>
+    </div>
+
+    <!-- SLIDE 9 -->
+    <div class="slide">
+      <h1>3.1 Acoplamento e Proteção Elétrica (Cont.)</h1>
+      <ul>
+        <li><strong>Uso de Transistores como Chaves Eletrônicas:</strong> Para isolar o pino sensível do microcontrolador e amplificar a capacidade de corrente, utilizam-se transistores bipolares NPN de potência (como o TIP120, BD135, BD137 ou BD139). O pino digital do processador envia uma corrente mínima para a <strong>Base (B)</strong> do transistor, o que satura a junção semicondutora e permite que uma corrente muito maior flua de forma controlada entre o <strong>Coletor (C)</strong> e o <strong>Emissor (E)</strong> para alimentar as cargas pesadas vinculadas a fontes de alimentação externas independentes.</li>
+        <li><strong>Diodo de Proteção contra Força Eletromotriz Inversa (Efeito Indutivo):</strong> Dispositivos baseados em bobinas de fios enrolados (como motores de corrente contínua e relés) armazenam energia mecânica em campos eletromagneticos enquanto estão ligados. Quando o transistor desliga e a alimentação é cortada bruscamente, o campo magnético colapsa quase instantaneamente. Esse colapso induz uma <strong>tensão reversa de pico extremamente elevada (força eletromotriz inversa)</strong> que percorre a fiação. Sem proteção, essa tensão reversa destrói os transistores e as portas do microcontrolador. Para evitar isso, instala-se um <strong>diodo retificador (como o 1N4001) em paralelo reverso com a carga indutiva</strong>. O diodo atua como uma válvula unidirecional segura, canalizando o pico de tensão e curto-circuitando-o de volta para a própria bobina, blindando o restante do circuito.</li>
+      </ul>
+    </div>
+
+    <!-- SLIDE 10 -->
+    <div class="slide">
+      <h1>3.2 Ponte H e Controle de Rotação Bidirecional</h1>
+      <ul>
+        <li><strong>Princípio de Funcionamento:</strong> Para inverter o sentido de giro de um motor CC, é necessário inverter o fluxo da corrente elétrica que atravessa seus polos. Isso é feito usando um arranjo elétrico clássico de quatro transistores chaveados chamado de <strong>Ponte H</strong> (que lembra o formato de uma letra "H" com o motor na barra central de carga). Ao fechar de forma cruzada as chaves eletrônicas diagonalmente opostas, a corrente atravessa o motor de um lado para o outro. Ao alternar para o par oposto de chaves lógicas, a corrente é invertida e o sentido de rotação também se inverte.</li>
+        <li><strong>Drivers Integrados:</strong> Circuitos integrados populares como o <strong>L293D, o SN754410 ou o L298N</strong> encapsulam pontes H duplas completas com diodos internos de proteção contra surtos indutivos em pastilhas de silício muito compactas, facilitando a montagem e economizando espaço físico de placa.</li>
+      </ul>
+    </div>
+
+    <!-- SLIDE 11 -->
+    <div class="slide">
+      <h1>3.3 Servomecanismos e Controle Angular</h1>
+      <ul>
+        <li><strong>O Servomotor:</strong> Consiste em um bloco integrado contendo um motor elétrico de corrente contínua, uma caixa de engrenagens de redução de velocidade, um potenciômetro de feedback de posição acoplado ao eixo de saída e um circuito de controle lógico de feedback fechado. O circuito interno lê constantemente a posição real do braço pelo potenciômetro e alimenta o motor CC para corrigir o ângulo de saída até que ele corresponda perfeitamente ao ângulo solicitado pelo controle lógico.</li>
+        <li><strong>Sinal de Controle por Largura de Pulso (PWM):</strong> O ângulo de posicionamento (tipicamente limitado entre 0º e 180º) é estabelecido enviando pulsos elétricos com durações medidas milimetricamente em milissegundos. Em períodos de pulsos de 40 a 50 Hz, a largura do pulso define a posição final:
+          <ul style="margin-top: 5px;">
+            <li>Um pulso estável de <strong>1,5 ms</strong> direciona o servo para sua <strong>posição central de 90º</strong>.</li>
+            <li>Um pulso de <strong>0,6 ms</strong> posiciona o braço no <strong>ângulo mínimo de 0º</strong> (ou -45º dependendo do modelo).</li>
+            <li>Um pulso de <strong>2,4 ms</strong> rotaciona até o <strong>ângulo máximo de 180º</strong> (ou +45º).</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <!-- SLIDE 12 -->
+    <div class="slide">
+      <h1>3.3 Servomecanismos (Cont.) & 3.4 Motores de Passo</h1>
+      <ul>
+        <li><strong>Modificação para Rotação Contínua:</strong> No servo modificado de rotação contínua, o circuito do potenciômetro de feedback é desconectado ou enganado eletronicamente. Dessa forma, o sinal de ângulo recebido passa a controlar a <strong>velocidade e o sentido de rotação</strong>: um comando de 0º rotaciona o motor continuamente em velocidade máxima para um sentido, 90º interrompe o movimento (estacionário), e 180º rotaciona em velocidade máxima no sentido oposto.</li>
+      </ul>
+      <h2>3.4 Motores de Passo (Stepper Motors)</h2>
+      <ul>
+        <li><strong>Funcionamento por Passos Discretos:</strong> Diferente de motores de CC tradicionais de rotação livre, o motor de passo possui um rotor dentado de ferro macio ou ímã permanente acoplado ao seu eixo e é cercado externamente por múltiplos eletromagnetos dentados dispostos em bobinas. Ao energizar as bobinas em uma sequência lógica precisa, o rotor é puxado magneticamente, realizando movimentos com deslocamentos angulares fixos e precisos (chamados de passos).</li>
+      </ul>
+    </div>
+
+    <!-- SLIDE 13 -->
+    <div class="slide">
+      <h1>3.4 Motores de Passo (Cont.)</h1>
+      <ul>
+        <li><strong>Sequência de Energização e Tipos:</strong> A precisão mecânica depende de mandar sinais altos (HIGH) e baixos (LOW) alternadamente nas bobinas.
+          <ul style="margin-top: 5px;">
+            <li><strong>Motores Unipolares:</strong> Possuem geralmente 5 ou 6 fios. As bobinas internas são divididas eletronicamente por uma derivação de centro (center tap) conectada diretamente à linha de alimentação, o que facilita o acionamento simples do terra nas extremidades das bobinas por transistores comuns.</li>
+            <li><strong>Motores Bipolares:</strong> Apresentam 4 fios e não possuem conexões centrais de derivação. A inversão de sentido de cada bobina requer pontes H dedicadas para inverter ativamente a polaridade da corrente.</li>
+          </ul>
+        </li>
+        <li><strong>Micropasso (Microstepping):</strong> Técnicas de controle sofisticadas que alimentam bobinas adjacentes de forma gradual (através de tensões proporcionais em ondas senoidais senão digitais rígidas), criando passos intermediários (meio-passo ou micropassos) para elevar drasticamente a resolução e suavidade de movimento, embora com redução de torque mecânico útil.</li>
+      </ul>
+    </div>
+
+    <!-- SLIDE 14 -->
+    <div class="slide">
+      <h1>3.5 Classificação Geral de Atuadores Industriais</h1>
+      <p>No contexto de automação industrial complexa e processos de manufatura inteligentes, os atuadores extrapolam os pequenos componentes de bancada e se dividem em quatro grandes grupos funcionais:</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Tipo de Atuador</th>
+            <th>Princípio de Operação</th>
+            <th>Vantagens Industriais</th>
+            <th>Aplicação Comum em IoT</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Elétricos</strong></td>
+            <td>Motores acionados por eletricidade que geram torque mecânico.</td>
+            <td>Controle preciso de posição, fácil integração digital, alta eficiência elétrica.</td>
+            <td>Controle de abertura de válvulas rotativas multivoltas e comportas motorizadas.</td>
+          </tr>
+          <tr>
+            <td><strong>Mecânicos Lineares</strong></td>
+            <td>Mecanismos de engrenagens, correntes ou fusos rosqueados que convertem movimento rotativo em linear.</td>
+            <td>Simplicidade de construção mecânica, alta confiabilidade e rigidez posicional.</td>
+            <td>Guias lineares de precisão, braços de montagem robóticos e eixos de movimentação.</td>
+          </tr>
+          <tr>
+            <td><strong>Hidráulicos</strong></td>
+            <td>Cilindros e motores de pistão operados pela pressão de fluidos incompressíveis sob a <strong>Lei de Pascal</strong>.</td>
+            <td>Geração de forças massivas de compressão/tração, alta rigidez e controle de cargas pesadas.</td>
+            <td>Equipamentos de construção civil pesada (escavadeiras, guindastes) e prensas industriais.</td>
+          </tr>
+          <tr>
+            <td><strong>Pneumáticos</strong></td>
+            <td>Pistões e cilindros movidos pela expansão de gases comprimidos secos.</td>
+            <td>Resposta muito rápida de curso, mecânica limpa (sem vazamento de óleo), custo operacional reduzido.</td>
+            <td>Cilindros de ejeção rápida em linhas de triagem de esteiras e garras de manipulação velozes.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SLIDE 15 -->
+    <div class="slide">
+      <h1>Tópico 4: Atividade Prática</h1>
+      <p>Nesta aula estabelecemos com precisão o fluxo funcional de um sistema cibernético, conectando a leitura do mundo físico à resposta mecânica através da camada intermediária de condicionamento de sinal e proteção elétrica. Seu maior valor está em prevenir falhas técnicas reais — como o colapso de componentes por surtos indutivos ou a queima de pinos do microcontrolador por sobrecorrente — ao alinhar a teoria de semicondutores e cálculos de acoplamento antes de qualquer prática.</p>
+      <h2>Atividade Final: Projeto e Equilíbrio de Nó IoT</h2>
+      <p>Vocês deverão pesquisar, projetar e dimensionar um sistema integrado de ponta a ponta composto por um <strong>Sensor</strong>, uma <strong>Estratégia de Condicionamento</strong> e um <strong>Atuador com Acoplamento Seguro</strong>, garantindo a compatibilidade elétrica e a estabilidade lógica do conjunto.</p>
+</div>
+
+    <!-- SLIDE 16 -->
+    <div class="slide">
+      <h1>Tópico 4: Atividade Prática (Cont.)</h1>
+      <h3>Etapas do Desenvolvimento:</h3>
+      <ol>
+        <li><strong>1. Seleção da Aplicação e Triângulo Tecnológico:</strong> Você deve escolher um problema prático e selecionar obrigatoriamente um componente de cada um dos 3 tópicos da aula.</li>
+        <li><strong>2. Memória de Cálculo e Proteção Elétrica:</strong> Dimensionar a eletrônica discreta para garantir que a corrente fornecida pelo microcontrolador fique dentro do limite seguro de 40 mA e que as leituras analógicas aproveitem ao máximo a resolução do ADC.
+          <ul style="margin-top: 5px;">
+            <li>Cálculo de divisores de tensão ou ajuste da tensão de referência do ADC (1,1V).</li>
+            <li>Dimensionamento da corrente de base do transistor de acionamento e especificação do diodo de proteção contra força eletromotriz inversa (1N4001) para cargas indutivas.</li>
+          </ul>
+        </li>
+        <li><strong>3. Algoritmo de Tratamento:</strong> Especificar a lógica de controle via software, incluindo um filtro de média móvel para atenuar ruídos de leitura antes de enviar o comando ao atuador.</li>
+      </ol>
+    </div>
+
+    <!-- SLIDE 17 -->
+    <div class="slide">
+      <h1>Tópico 4: Atividade Prática (Cont.)</h1>
+      <h2>Matriz de Sugestões de Sistemas Equilibrados</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Aplicação Proposta</th>
+            <th>Tópico 1: Sensoriamento</th>
+            <th>Tópico 2: Condicionamento</th>
+            <th>Tópico 3: Atuação & Proteção</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Exaustão Térmica Industrial</strong></td>
+            <td>Sensor Analógico LM35</td>
+            <td>Ref. Interna ADC (1,1V) + Filtro Média Móvel</td>
+            <td>Motor CC acionado por Transistor Bipolar NPN + Diodo 1N4001</td>
+          </tr>
+        </tbody>
+      </table>
+      <h2 style="margin-top: 20px;">Entregáveis Obrigatórios</h2>
+      <ul>
+        <li><strong>Esquema Elétrico Unifilar:</strong> Desenho técnico contendo o pinout do microcontrolador, diodos de proteção em paralelo reverso com bobinas e desacoplamento de fontes externas.</li>
+        <li><strong>Relatório Técnico de Viabilidade:</strong> Justificativa contendo os cálculos da equação do divisor de tensão (Vout = (R2 / (R1 + R2)) × Vin) e a demonstração de limitação de corrente nas portas digitais.</li>
+      </ul>
+    </div>
+
+    <!-- NAUFRÁGIO / NAVEGAÇÃO -->
+    <div class="controls">
+      <button class="btn" id="prevBtn" onclick="changeSlide(-1)">Anterior</button>
+      <span class="slide-counter" id="slideCounter">Slide 1 de 16</span>
+      <button class="btn" id="nextBtn" onclick="changeSlide(1)">Próximo</button>
+    </div>
+
+  </div>
+
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const slideCounter = document.getElementById('slideCounter');
+
+    function updateSlides() {
+      slides.forEach((slide, index) => {
+        slide.classList.toggle('active', index === currentSlide);
+      });
+      
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === slides.length - 1;
+      slideCounter.textContent = `Slide ${currentSlide + 1} de ${slides.length}`;
+    }
+
+    function changeSlide(direction) {
+      currentSlide += direction;
+      if (currentSlide < 0) currentSlide = 0;
+      if (currentSlide >= slides.length) currentSlide = slides.length - 1;
+      updateSlides();
+    }
+
+    // Suporte a navegação pelas setas do teclado
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight'|| e.key === 'PageUp' || e.key === 'Space') {
+        if (currentSlide < slides.length - 1) changeSlide(1);
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageDown') {
+        if (currentSlide > 0) changeSlide(-1);
+      }
+    });
+
+    updateSlides();
+  </script>
+</body>
+</html>
