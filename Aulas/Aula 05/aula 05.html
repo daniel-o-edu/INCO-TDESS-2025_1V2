@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aula 05 — Fundamentos da Linguagem C Embarcada</title>
+<style>
+ body {
+ margin: 0; 
+ padding: 0; 
+ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+ background-color: #f8f9fa; 
+ color: #212529;
+ display: flex; 
+ flex-direction: column; 
+ height: 100vh;
+ overflow: hidden;
+ }
+ .slide-container {
+ width: 95vw;
+ height: 85vh;
+ margin: auto;
+ display: flex; 
+ align-items: center; 
+ justify-content: center;
+ padding: 20px; 
+ box-sizing: border-box; 
+ position: relative;
+ }
+ .slide {
+ display: none; 
+ width: 100%; 
+ max-width: 1200px; 
+ height: 80vh;
+ background: #ffffff; 
+ border-radius: 12px;
+ box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+ padding: 50px;
+ font-size: 24px; 
+ line-height: 1.5; 
+ overflow-y: auto;
+ }
+ .slide.active { 
+ display: block; 
+ animation: fadeIn 0.4s ease-in-out;
+ }
+ @keyframes fadeIn {
+ from { opacity: 0; transform: translateY(10px); }
+ to { opacity: 1; transform: translateY(0); }
+ }
+ h1, h2, h3, h4 { 
+ color: #0d6efd; 
+ margin-top: 0; 
+ }
+ code, pre { 
+ background: #e9ecef; 
+ padding: 10px 15px; 
+ border-radius: 8px; 
+ font-family: 'Courier New', Courier, monospace; 
+ display: block; 
+ font-size: 20px;
+ overflow-x: auto;
+ white-space: pre-wrap;
+ }
+ .controls {
+ height: 80px; 
+ background: #ffffff; 
+ border-top: 1px solid #dee2e6;
+ display: flex; 
+ justify-content: space-between; 
+ align-items: center; 
+ padding: 0 50px;
+ }
+ button {
+ background: #0d6efd; 
+ color: white; 
+ border: none; 
+ padding: 12px 25px;
+ font-size: 18px; 
+ border-radius: 8px; 
+ cursor: pointer;
+ transition: background 0.2s;
+ }
+ button:hover {
+ background: #0b5ed7;
+ }
+ button:disabled { 
+ background: #adb5bd; 
+ cursor: not-allowed; 
+ }
+ .progress { 
+ font-size: 20px; 
+ font-weight: bold; 
+ color: #495057;
+ }
+ .slide-label { font-weight: bold; text-transform: uppercase; color: #6c757d; margin-bottom: 20px; font-size: 18px; letter-spacing: 1px; }
+ .callout { padding: 20px 30px; border-radius: 8px; margin: 20px 0; border-left: 8px solid; }
+ .callout.blue { background: #cce5ff; border-color: #004085; color: #004085; }
+ .callout.green { background: #d4edda; border-color: #155724; color: #155724; }
+ .callout.red { background: #f8d7da; border-color: #721c24; color: #721c24; }
+ .callout.yellow { background: #fff3cd; border-color: #856404; color: #856404; }
+ .section-header { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; }
+ .section-num { font-size: 80px; font-weight: bold; color: #e9ecef; margin-bottom: -20px; }
+ .section-header h2 { font-size: 48px; color: #0d6efd; margin-bottom: 20px; }
+ img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; border: 1px solid #dee2e6; }
+ table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 20px; }
+ th, td { border: 1px solid #dee2e6; padding: 12px; text-align: left; }
+ th { background-color: #e9ecef; color: #0d6efd; }
+</style>
+</head>
+<body>
+ <div class="slide-container" id="slides">
+
+ <div class="slide active">
+ <div class="slide-label">Aula 05</div>
+ <h1>Aula 05 — Fundamentos da Linguagem C Embarcada</h1>
+ <p><strong>Descrição:</strong> Estudo de sintaxe básica, tipos de dados, variáveis, operadores matemáticos/lógicos e boas práticas de código limpo em C.</p>
+ <p><strong>Objetivo:</strong> Compreender a sintaxe essencial da linguagem C aplicada a microcontroladores, dominando o uso de tipos de dados, variáveis, operadores e as premissas de código limpo para sistemas com recursos restritos.</p>
+ </div>
+ 
+ <div class="slide">
+ <div class="section-header">
+ <div class="section-num">01</div>
+ <h2>Bloco 1 — Introdução ao C para Sistemas Embarcados</h2>
+ </div>
+ </div>
+
+ <div class="slide">
+ <h2>1.1 O Papel do Compilador e o Fluxo de Execução</h2>
+ <p>Na programação de microcontroladores (como a plataforma Arduino), o código escrito no computador é chamado de <strong>sketch</strong>. Esse código é redigido em um dialeto baseado na linguagem C/C++ (frequentemente associado à linguagem de programação <em>Wiring</em>). No entanto, microcontroladores não conseguem ler texto diretamente; eles compreendem apenas níveis lógicos de tensão e instruções em formato binário.</p>
+ <p>O <strong>compilador</strong> é o utilitário de software responsável por traduzir o código-fonte legível por humanos para o <strong>código de máquina</strong> (arquivos binários contendo sequências de 0s e 1s).</p>
+ <ul>
+ <li>Quando clicamos no botão <strong>Verify (Verificar)</strong> na IDE do Arduino, o compilador apenas analisa a sintaxe do programa para garantir que ele respeita rigorosamente as regras estruturais da linguagem C.</li>
+ <li>Ao clicar no botão <strong>Upload (Carregar)</strong>, o processo de compilação é concluído, o arquivo binário gerado é transferido através do cabo USB e gravado permanentemente na memória do chip de controle do hardware.</li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>1.2 A Estrutura Básica de um Sketch: as Funções setup() e loop()</h2>
+ <p>Um programa para microcontrolador obrigatoriamente deve conter duas funções fundamentais pré-definidas para que possa compilar com sucesso:</p>
+<pre><code>void setup() {
+  // Código executado apenas uma única vez
+}
+void loop() {
+  // Código executado repetidamente em ciclo infinito
+}</code></pre>
+ <ul>
+ <li><strong>A Função setup():</strong> Executada apenas <strong>uma única vez</strong> no momento em que a placa é ligada, quando o botão <em>Reset</em> é pressionado ou após a transferência de um novo código. Destina-se às <strong>configurações iniciais do sistema</strong>, como a definição dos pinos do microcontrolador que atuarão como entrada ou saída (<i>pinMode</i>), inicialização de taxas de transmissão de barramentos seriais (<i>Serial.begin</i>) e acionamento inicial de periféricos.</li>
+ <li><strong>A Função loop():</strong> Entra em execução sequencial imediatamente após o término de <i>setup()</i>. Seu comportamento é o de um <strong>laço de repetição infinito (ciclo de amostragem)</strong>. Ela executa as linhas de comando de cima para baixo, passo a passo; ao atingir a chave de fechamento <i>}</i>, o programa reinicia a leitura a partir da primeira instrução do bloco. É onde ocorrem as leituras contínuas de sensores, o processamento de lógica de controle e o acionamento dinâmico de atuadores.</li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>1.3 Gerenciamento de Memória e Restrições de Hardware</h2>
+ <p>Diferente de um computador pessoal, que dispõe de gigabytes de RAM e armazenamento, os microcontroladores operam sob severas limitações físicas de recursos computacionais:</p>
+ <ol>
+ <li><strong>Memória Flash (Não Volátil):</strong> Destina-se ao armazenamento do código binário do programa (o <em>sketch</em> compilado). Os dados aqui guardados não são perdidos quando o dispositivo é desligado.
+ <ul>
+ <li>No microcontrolador <strong>ATmega328</strong> (utilizado no Arduino Uno), há apenas <strong>32 kB de Flash</strong> (sendo que 2 kB são reservados para o <em>bootloader</em> de inicialização do chip, restando 30 kB úteis).</li>
+ <li>No <strong>ATmega2560</strong> (Arduino Mega), dispõe-se de <strong>128 kB de Flash</strong> (com 4 kB dedicados ao <em>bootloader</em>).</li>
+ </ul>
+ </li>
+ </ol>
+ </div>
+
+ <div class="slide">
+ <h2>1.3 Gerenciamento de Memória e Restrições (Continuação)</h2>
+ <ol start="2">
+ <li><strong>Memória SRAM (Estática de Acesso Aleatório — Volátil):</strong> Utilizada como memória de trabalho para armazenar variáveis temporárias de processamento, pilhas de funções e dados de comunicação. É extremamente escassa:
+ <ul>
+ <li>O <strong>ATmega328 possui somente 2 kB (2.000 bytes) de SRAM</strong>.</li>
+ <li><strong>Consequência Crítica:</strong> Se o programador utilizar tipos de dados muito grandes ou arrays gigantescos, a memória SRAM se esgotará rapidamente. <strong>O Arduino não emite alertas de falta de memória durante a execução do programa; ele simplesmente trava ou reinicia sem aviso prévio</strong>.</li>
+ <li><em>Soluções de otimização:</em> Para economizar SRAM, podemos forçar o armazenamento de dados imutáveis (como fontes de caracteres ou mensagens longas de texto) diretamente na memória Flash utilizando o modificador especial <strong>PROGMEM</strong> (necessitando importar a biblioteca <i>&lt;avr/pgmspace.h&gt;</i>).</li>
+ </ul>
+ </li>
+ <li><strong>Memória EEPROM (Não Volátil e Gravável):</strong> Utilizada para persistência de dados de calibração que devem sobreviver à falta de energia elétrica (como valores máximos ou configurações do usuário), mas que precisam ser alterados eventualmente por software.</li>
+ </ol>
+ </div>
+
+ <div class="slide">
+ <h2>1.4 Boas Práticas Iniciais: Código Limpo Embarcado</h2>
+ <p>Desenvolver código limpo (<em>clean code</em>) em hardware de recursos restritos é essencial para a manutenção e estabilidade do projeto:</p>
+ <ul>
+ <li><strong>Nomenclatura de Variáveis (Convenção CamelCase):</strong> Nomes de variáveis devem ser descritivos (mostrando claramente sua utilidade no circuito) e não conter espaços em branco ou caracteres especiais. A convenção amplamente recomendada dita que variáveis e funções iniciem com <strong>letras minúsculas</strong> e, caso o nome seja composto, as palavras seguintes comecem com <strong>letras maiúsculas</strong> (exemplo: <i>ledPin</i> ou <i>tempoEsperaAlerta</i>).</li>
+ <li><strong>Indentação e Espaços em Branco:</strong> O compilador ignora completamente recuos de tabulação (indentações), quebras de linha ou espaços redundantes. Eles servem exclusivamente para garantir a leitura humana. Sempre organize o código com chaves alinhadas para delimitar os escopos de forma legível.</li>
+ <li><strong>Comentários Descritivos:</strong> Servem para explicar o funcionamento e a intenção da lógica, sendo ignorados pelo compilador. Em C, utilizamos:
+ <ul>
+ <li><i>//</i> para <strong>comentários de linha única</strong>.</li>
+ <li><i>/*</i> e <i>*/</i> para <strong>comentários multilinha ou blocos de código</strong>.</li>
+ </ul>
+ </li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <div class="section-header">
+ <div class="section-num">02</div>
+ <h2>Bloco 2 — Tipos de Dados e Variáveis</h2>
+ </div>
+ </div>
+
+ <div class="slide">
+ <h2>2.1 Tipos Primitivos na Arquitetura AVR (8 bits)</h2>
+ <p>Uma variável é uma região nomeada da memória SRAM onde podemos armazenar informações durante o processamento do programa. Em C, é obrigatório declarar o <strong>tipo exato de dado</strong> que a variável armazenará.</p>
+ <p>A tabela abaixo exibe os tipos primitivos na arquitetura de microcontroladores AVR (como o Arduino Uno):</p>
+ <table>
+ <tr>
+ <th>Tipo de Dado</th>
+ <th>Tamanho na SRAM</th>
+ <th>Faixa de Valores</th>
+ <th>Aplicação Recomendada</th>
+ </tr>
+ <tr>
+ <td><strong>boolean / bool</strong></td>
+ <td>1 byte</td>
+ <td>true (1) ou false (0)</td>
+ <td>Flags de estado (ex: ledLigado = true).</td>
+ </tr>
+ <tr>
+ <td><strong>char</strong></td>
+ <td>1 byte</td>
+ <td>-128 a 127</td>
+ <td>Armazenar caracteres individuais ASCII (entre aspas simples ' ').</td>
+ </tr>
+ <tr>
+ <td><strong>byte</strong></td>
+ <td>1 byte</td>
+ <td>0 a 255</td>
+ <td>Controle de pinos físicos e comunicação serial de bytes.</td>
+ </tr>
+ <tr>
+ <td><strong>int</strong></td>
+ <td>2 bytes (16 bits)</td>
+ <td>-32.768 a 32.767</td>
+ <td>Leituras de ADC (0 a 1023), cálculos e contadores pequenos.</td>
+ </tr>
+ <tr>
+ <td><strong>unsigned int</strong></td>
+ <td>2 bytes (16 bits)</td>
+ <td>0 a 65.535</td>
+ <td>Contadores estritamente positivos de até 16 bits.</td>
+ </tr>
+ <tr>
+ <td><strong>long</strong></td>
+ <td>4 bytes (32 bits)</td>
+ <td>-2.147.483.648 a 2.147.483.647</td>
+ <td>Cálculos matemáticos grandes.</td>
+ </tr>
+ <tr>
+ <td><strong>unsigned long</strong></td>
+ <td>4 bytes (32 bits)</td>
+ <td>0 a 4.294.967.295</td>
+ <td>Medições de tempo longas via função millis().</td>
+ </tr>
+ <tr>
+ <td><strong>float</strong></td>
+ <td>4 bytes (32 bits)</td>
+ <td>&plusmn;3.4028235 &times; 10<sup>38</sup></td>
+ <td>Números reais/ponto flutuante (cálculos de engenharia e física).</td>
+ </tr>
+ <tr>
+ <td><strong>double</strong></td>
+ <td>4 bytes (32 bits)</td>
+ <td>O mesmo que o float</td>
+ <td><strong>No Arduino Uno, o double não possui precisão dupla de 8 bytes</strong> (é processado exatamente como float).</td>
+ </tr>
+ </table>
+ </div>
+
+ <div class="slide">
+ <h2>2.2 Modificadores de Tipo</h2>
+ <p>Os modificadores alteram a forma como o compilador reserva espaço e gerencia o bit de sinal de uma variável:</p>
+ <ul>
+ <li><strong>signed:</strong> Modo padrão. Indica que a variável pode receber tanto valores positivos quanto negativos, mantendo o bit mais significativo dedicado à representação do sinal algébrico.</li>
+ <li><strong>unsigned:</strong> Elimina o bit de sinal de variáveis do tipo <i>char</i> ou <i>int</i>, permitindo armazenar apenas números positivos e o zero. <strong>Como consequência, dobra-se a capacidade positiva de representação de valor</strong> (ex: o <i>char</i> vai de -128 a 127, enquanto o <i>unsigned char</i> vai de 0 a 255).</li>
+ <li><strong>short:</strong> Garante que uma variável inteira terá tamanho fixo de 16 bits.</li>
+ <li><strong>long:</strong> Expande o tamanho de variáveis inteiras para 32 bits (ou indica maior precisão para floats em sistemas não-AVR).</li>
+ </ul>
+ <div class="callout yellow">
+ <strong>Regra de Ouro para Recursos Restritos:</strong> Escolher sempre o menor tipo de dado suficiente para a tarefa é um princípio de otimização crucial.
+ </div>
+ <p><strong>Exemplo Prático:</strong> Armazenar o número de uma porta física do Arduino (que varia de 0 a 13 no Uno ou de 0 a 54 no Mega) em uma variável do tipo <i>int</i> consome <strong>2 bytes</strong> de SRAM. Ao declarar essa variável como tipo <i>byte</i>, consome-se apenas <strong>1 byte</strong>, poupando metade da memória alocada para aquele pino.</p>
+ </div>
+
+ <div class="slide">
+ <h2>2.3 Escopo de Variáveis: Locais versus Globais</h2>
+ <p>O local de declaração de uma variável define a visibilidade (escopo) e o seu tempo de existência na memória do dispositivo:</p>
+<pre><code>int pinoSensor = A0; // VARIÁVEL GLOBAL: Visível em todo o código.
+void loop() {
+  int leituraLocal = analogRead(pinoSensor); // VARIÁVEL LOCAL: Existe apenas no ciclo do loop().
+  static int contadorBipes = 0; // LOCAL ESTÁTICA: Visível apenas no loop(), mas não perde seu valor.
+  contadorBipes++;
+}</code></pre>
+ <ol>
+ <li><strong>Variáveis Globais:</strong> Declaradas fora de qualquer função (no topo do sketch). Elas permanecem na memória SRAM durante todo o tempo de funcionamento da placa e podem ser acessadas e modificadas por qualquer função do programa.
+ <ul>
+ <li><strong>Perigo elétrico/lógico:</strong> O uso massivo de variáveis globais aumenta desnecessariamente o consumo contínuo da escassa RAM. Além disso, dificulta o diagnóstico de erros, já que qualquer trecho isolado do programa pode alterar o valor da variável de forma inesperada.</li>
+ </ul>
+ </li>
+ </ol>
+ </div>
+
+ <div class="slide">
+ <h2>2.3 Escopo de Variáveis (Continuação)</h2>
+ <ol start="2">
+ <li><strong>Variáveis Locais:</strong> Declaradas dentro de um bloco delimitador (como o interior de uma função ou de um laço <i>for</i>). São criadas no momento em que a função entra em execução e destruídas imediatamente quando ela se encerra, liberando espaço de memória. Elas não podem ser vistas ou alteradas por outras funções externas.</li>
+ <li><strong>Variáveis Locais Estáticas (static):</strong> Se declararmos uma variável dentro de uma função precedida pelo qualificador <i>static</i>, ela se comportará como uma variável local (visível apenas dentro daquela função), mas <strong>não será destruída ao fim da execução</strong>. Ela reterá seu valor acumulado de modo que, na próxima vez que a função for chamada, o dado estará preservado, sem a necessidade de criar uma variável global.</li>
+ </ol>
+ </div>
+
+ <div class="slide">
+ <h2>2.4 Diretiva #define versus Qualificador const</h2>
+ <p>Para associar nomes legíveis a pinos ou valores imutáveis de calibração que não mudam durante a execução, existem dois caminhos em C:</p>
+ <ul>
+ <li><strong>A Diretiva #define:</strong> É uma instrução direcionada ao pré-processador (executada momentos antes da compilação real). Ela simplesmente localiza todas as ocorrências textuais do identificador no código e as substitui pelo valor literal definido, de forma cega.
+ <ul>
+ <li><em>Sintaxe:</em> <i>#define ledPin 13</i> (Atenção: não utiliza sinal de igual <i>=</i> e não termina com ponto e vírgula <i>;</i>).</li>
+ <li><em>Vantagem:</em> <strong>Não consome nenhum byte da memória SRAM</strong>, pois seus valores são incorporados diretamente como constantes literais nas instruções binárias da Flash.</li>
+ </ul>
+ </li>
+ <li><strong>O Qualificador const:</strong> Declara uma variável convencional de leitura e escrita padrão, porém qualifica seu estado de uso como <strong>somente leitura</strong>. Seu valor deve ser obrigatoriamente atribuído no exato momento da declaração e não poderá ser alterado posteriormente pelo programa.
+ <ul>
+ <li><em>Sintaxe:</em> <i>const byte ledPin = 13;</i></li>
+ <li><em>Vantagem:</em> Respeita regras de escopo e tipagem estrita de variáveis em C, facilitando a depuração segura de código pelo compilador.</li>
+ </ul>
+ </li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <div class="section-header">
+ <div class="section-num">03</div>
+ <h2>Bloco 3 — Operadores Matemáticos, Lógicos, de Atribuição e Precedência</h2>
+ </div>
+ </div>
+
+ <div class="slide">
+ <h2>3.1 Operadores Aritméticos e Divisões</h2>
+ <p>Os operadores aritméticos realizam cálculos matemáticos sobre valores numéricos de variáveis e constantes:</p>
+ <ul>
+ <li><i>+</i> (Adição)</li>
+ <li><i>-</i> (Subtração)</li>
+ <li><i>*</i> (Multiplicação)</li>
+ <li><i>/</i> (Divisão)</li>
+ <li><i>%</i> (Módulo ou Resto da Divisão) — <strong>Aplicável unicamente para operandos do tipo inteiro</strong> (<i>int</i> ou <i>char</i>).</li>
+ </ul>
+ <div class="callout red">
+ <strong>A Armadilha da Divisão Inteira:</strong> Em C, se os dois números operados forem inteiros, o compilador realizará uma divisão inteira por padrão, <strong>descartando completamente a parte fracionária do quociente</strong> (sem realizar arredondamentos).
+ </div>
+<pre><code>int resultado1 = 5 / 2;     // O resultado gravado na variável será 2.
+float resultado2 = 5 / 2;   // O resultado continuará sendo 2.0 (pois a divisão entre inteiros ocorreu antes)!
+float resultado3 = 5.0 / 2.0; // O resultado correto será 2.5 (pois ao menos um dos valores foi forçado como float).</code></pre>
+ </div>
+
+ <div class="slide">
+ <h2>3.2 Operadores Relacionais e Lógicos</h2>
+ <p>Os operadores relacionais e lógicos comparam valores ou expressões e retornam obrigatoriamente um valor booleano: <strong>1 (verdadeiro)</strong> ou <strong>0 (falso)</strong>.</p>
+ <h3>Operadores Relacionais (Comparação):</h3>
+ <ul>
+ <li><i>==</i> (Igual a) — <em>Cuidado para não confundir com o operador de atribuição de sinal único <i>=</i></em>.</li>
+ <li><i>!=</i> (Diferente de).</li>
+ <li><i>&gt;</i> (Maior que) / <i>&lt;</i> (Menor que).</li>
+ <li><i>&gt;=</i> (Maior ou igual a) / <i>&lt;=</i> (Menor ou igual a).</li>
+ </ul>
+ <h3>Operadores Lógicos (Conexão de Condições):</h3>
+ <p>Permitem unificar múltiplas comparações relacionais em expressões mais complexas:</p>
+ <ul>
+ <li><strong><i>&amp;&amp;</i> (Operador E / AND):</strong> A expressão composta resultante só retornará Verdadeiro (1) se <strong>todas as condições individuais</strong> que a compõem forem verdadeiras.</li>
+ <li><strong><i>||</i> (Operador OU / OR):</strong> A expressão retornará Verdadeiro (1) se <strong>pelo menos uma das condições</strong> individuais for verdadeira.</li>
+ <li><strong><i>!</i> (Operador NEGAÇÃO / NOT):</strong> Inverte o valor lógico da expressão subsequente.</li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>3.3 Incremento, Decremento e Atribuições Compactas</h2>
+ <p>Para otimizar a escrita de códigos repetitivos, a linguagem C provê formas sintéticas e eficientes de operação e atribuição imediata:</p>
+ <h3>Operadores de Atribuição Composta:</h3>
+ <p>Substituem a repetição da variável de destino na expressão de cálculo:</p>
+ <ul>
+ <li><i>x += y</i> equivale a <code>x = x + y</code></li>
+ <li><i>x -= y</i> equivale a <code>x = x - y</code></li>
+ <li><i>x *= y</i> equivale a <code>x = x * y</code></li>
+ <li><i>x /= y</i> equivale a <code>x = x / y</code></li>
+ <li><i>x %= y</i> equivale a <code>x = x % y</code></li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>3.3 Incremento, Decremento e Atribuições Compactas (Cont.)</h2> 
+ <p>⚠️ <strong>Atenção para a Precedência Oculta:</strong> O operador de atribuição composta atua sobre o <strong>resultado total</strong> da expressão localizada à sua direita. Portanto: <i>x *= y - 10;</i> é o equivalente exato a <i>x = x * (y - 10);</i> (e <strong>não</strong> a <i>x = x * y - 10;</i>).</p>
+ </div>
+
+ <div class="slide">
+ <h2>3.3 Incremento, Decremento (Continuação)</h2>
+ <h3>Operadores de Pré e Pós-Incremento/Decremento:</h3>
+ <p>Utilizados para somar ou subtrair uma unidade (1) de uma variável de forma rápida:</p>
+ <ul>
+ <li><strong>Pós-Incremento (x++):</strong> Utiliza o valor atual de x na expressão e, em seguida, acrescenta 1 à variável.</li>
+ <li><strong>Pré-Incremento (++x):</strong> Adiciona 1 à variável x imediatamente e depois utiliza o valor já incrementado para computar a expressão.</li>
+ </ul>
+<pre><code>int x = 10;
+int y = x++; // y recebe 10 (valor original) e x vai para 11.
+int a = 10;
+int b = ++a; // a vai para 11 e b recebe 11 (valor já incrementado).</code></pre>
+ </div>
+
+ <div class="slide">
+ <h2>3.4 Tabela de Precedência de Operadores</h2>
+ <p>Quando uma mesma linha de comando possui múltiplos operadores, o compilador decide qual cálculo executar primeiro com base em uma hierarquia de prioridades fixa (regras de precedência). O uso de <strong>parênteses ( )</strong> permite forçar e controlar a ordem em que os cálculos ocorrem.</p>
+ <p>Abaixo estão listados os níveis mais comuns de precedência na linguagem C (do de maior prioridade para o de menor):</p>
+ <ol>
+ <li><i>++</i> (Pré-incremento) e <i>--</i> (Pré-decremento), Parênteses <i>( )</i>, Elemento de array <i>[ ]</i>.</li>
+ <li><i>++</i> (Pós-incremento) e <i>--</i> (Pós-decremento), Operador de negação lógica <i>!</i>.</li>
+ <li><i>*</i> (Multiplicação), <i>/</i> (Divisão), <i>%</i> (Módulo ou Resto).</li>
+ <li><i>+</i> (Adição), <i>-</i> (Subtração).</li>
+ <li><i>&lt;&lt;</code> , <i>&gt;&gt;</i> (Deslocadores de bits).</li>
+ <li><i>&lt;</code> , <i>&lt;=</code> , <i>&gt;</i> , <i>&gt;=</i> (Operadores relacionais de magnitude).</li>
+ <li><i>==</code> , <i>!=</code> (Operadores relacionais de igualdade/diferença).</li>
+ <li><i>&amp;&amp;</i> (Operador lógico E).</li>
+ <li><i>||</i> (Operador lógico OU).</li>
+ <li><i>=</i>, <i>+=</i>, <i>-=</i>, <i>*=</i>, <i>/=</i>, <i>%=</i> (Operadores de atribuição simples e compostas).</li>
+ </ol>
+ </div>
+
+ <div class="slide">
+ <h2>Resumo das Boas Práticas da Aula</h2>
+ <ol>
+ <li><strong>Sempre prefira o tipo de dado de menor tamanho possível</strong> para economizar a preciosa memória SRAM do microcontrolador (ex: use byte para pinos).</li>
+ <li><strong>Declare variáveis com escopo local</strong> sempre que possível para que a memória SRAM seja liberada ao fim das funções.</li>
+ <li><strong>Utilize #define</strong> para associar nomes fáceis a pinos físicos do circuito sem desperdiçar memória RAM de variáveis.</li>
+ <li><strong>Cuidado redobrado com a divisão inteira</strong> e garanta que ao menos um elemento seja representado com ponto decimal (como .0) quando necessitar de resultados com casas fracionárias.</li>
+ </ol>
+ </div>
+
+ <div class="slide">
+ <div class="section-header">
+ <div class="section-num">04</div>
+ <h2>Bloco 4 — Laboratório Prático e Revisão de Código Limpo</h2>
+ </div>
+ </div>
+
+ <div class="slide">
+ <h2>4.1 Análise de Código Legado e Refatoração Guiada</h2>
+ <p>As atividades a seguir foram projetadas para consolidar a compreensão sobre o gerenciamento rigoroso da memória SRAM, a escolha adequada de tipos primitivos, o escopo de variáveis e a aplicação de conversão de tipos (casting) em sistemas de recursos restritos.</p>
+ <p><strong>Objetivo Pedagógico:</strong> Desenvolver a capacidade crítica de identificação de más práticas de programação embarcada, compreendendo os impactos diretos do uso inadequado de memória no comportamento físico do microcontrolador (ATmega328P).</p>
+ </div>
+ 
+ <div class="slide">
+ <h3>4.1.1 Código Legado Ineficiente</h3>
+ <p>Examine o código fonte abaixo, extraído de um projeto legado de monitoramento analógico:</p>
+<pre><code>int pinoLeitura = A0; // Pino do sensor analógico  
+int pinoLed = 13;     // Pino do LED de alerta  
+int valorLido = 0;    // Leitura bruta do ADC  
+float tensao = 0;     // Tensão calculada em Volts  
+  
+void setup() {  
+  Serial.begin(9600);  
+  pinMode(pinoLed, OUTPUT);  
+}  
+  
+void loop() {  
+  valorLido = analogRead(pinoLeitura);  
+  tensao = valorLido / 1023 * 5; // Cálculo da tensão equivalente  
+    
+  if(tensao &gt; 2.5) {  
+    digitalWrite(pinoLed, HIGH);  
+  } else {  
+    digitalWrite(pinoLed, LOW);  
+  }  
+  delay(1000);  
+}</code></pre>
+ </div>
+
+ <div class="slide">
+ <h2>4.1 Análise de Código (Continuação)</h2>
+ <div class="callout blue">
+ <strong>Atividade 1: Análise e Refatoração Guiada de Código Legado</strong><br>
+ Vocês devem analisar o código mal estruturado acima, identificar cinco falhas de boas práticas/otimização e reescrevê-lo aplicando os princípios de código limpo embarcado.
+ </div>
+ </div>
+
+ <div class="slide">
+ <h2>4.2 Exercício Prático: Declaração, Casting e Monitor Serial</h2>
+ <p><strong>Objetivo do Exercício:</strong> Aplicar conceitos de tipos primitivos, conversão de tipos explícita (casting), cálculos de média e exibição de dados formatados na interface serial.</p>
+ <h3>4.2.1 Enunciado do Desafio</h3>
+ <p>Desenvolva um sketch em C para microcontrolador que execute as seguintes tarefas:</p>
+ <ol>
+ <li>Simule o acúmulo de três leituras analógicas consecutivas (soma total) em uma variável inteira de 16 bits.</li>
+ <li>Calcule a média aritmética exata dessa amostragem, armazenando-a em uma variável do tipo ponto flutuante (float). Utilize <strong>casting explícito</strong> no cálculo.</li>
+ <li>Mapeie proporcionalmente o valor médio obtido (que varia de 0.0 a 1023.0) para uma escala de controle PWM de 8 bits (0 a 255), convertendo o resultado explicitamente para o tipo byte.</li>
+ <li>Envie o sinal de controle PWM simulado para um pino físico do microcontrolador e exiba os dados formatados no Monitor Serial com duas casas decimais de precisão.</li>
+ </ol>
+ <div class="callout yellow">
+ <h1>Enviar a atividade completa no AVA</h1>
+ <strong>Aula 05 - Atividade</strong>
+ </div>
+ </div>
+ 
+ </div>
+
+ <div class="controls">
+ <button id="prevBtn" onclick="prevSlide()" disabled>Anterior</button>
+ <div class="progress"><span id="current">1</span> / <span id="total"></span></div>
+ <button id="nextBtn" onclick="nextSlide()">Próximo</button>
+ </div>
+
+ <script>
+ let currentSlideIndex = 0;
+ const slides = document.querySelectorAll('.slide');
+ const totalSlides = slides.length;
+ const currentIndicator = document.getElementById('current');
+ const totalIndicator = document.getElementById('total');
+ const prevBtn = document.getElementById('prevBtn');
+ const nextBtn = document.getElementById('nextBtn');
+
+ totalIndicator.textContent = totalSlides;
+
+ function updateView() {
+ slides.forEach((slide, index) => {
+ slide.classList.remove('active');
+ if (index === currentSlideIndex) {
+ slide.classList.add('active');
+ }
+ });
+ currentIndicator.textContent = currentSlideIndex + 1;
+ 
+ prevBtn.disabled = currentSlideIndex === 0;
+ nextBtn.disabled = currentSlideIndex === totalSlides - 1;
+ }
+
+ function nextSlide() {
+ if (currentSlideIndex < totalSlides - 1) {
+ currentSlideIndex++;
+ updateView();
+ }
+ }
+
+ function prevSlide() {
+ if (currentSlideIndex > 0) {
+ currentSlideIndex--;
+ updateView();
+ }
+ }
+
+ document.addEventListener('keydown', (e) => {
+ if (e.key === 'ArrowRight' || e.key === 'PageDown') nextSlide();
+ if (e.key === 'ArrowLeft' || e.key === 'PageUp') prevSlide();
+ });
+ </script>
+</body>
+</html>
