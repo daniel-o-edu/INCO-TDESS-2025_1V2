@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aula 07 — Funções, Escopo e Manipulação de Dados</title>
+<style>
+ body {
+ margin: 0; 
+ padding: 0; 
+ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+ background-color: #f8f9fa; 
+ color: #212529;
+ display: flex; 
+ flex-direction: column; 
+ height: 100vh;
+ overflow: hidden;
+ }
+ .slide-container {
+ width: 95vw;
+ height: 85vh;
+ margin: auto;
+ display: flex; 
+ align-items: center; 
+ justify-content: center;
+ padding: 20px; 
+ box-sizing: border-box; 
+ position: relative;
+ }
+ .slide {
+ display: none; 
+ width: 100%; 
+ max-width: 1200px; 
+ height: 80vh;
+ background: #ffffff; 
+ border-radius: 12px;
+ box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+ padding: 50px;
+ font-size: 24px; 
+ line-height: 1.5; 
+ overflow-y: auto;
+ }
+ .slide.active { 
+ display: block; 
+ animation: fadeIn 0.4s ease-in-out;
+ }
+ @keyframes fadeIn {
+ from { opacity: 0; transform: translateY(10px); }
+ to { opacity: 1; transform: translateY(0); }
+ }
+ h1, h2, h3, h4 { 
+ color: #0d6efd; 
+ margin-top: 0; 
+ }
+ code, pre { 
+ background: #e9ecef; 
+ padding: 10px 15px; 
+ border-radius: 8px; 
+ font-family: 'Courier New', Courier, monospace; 
+ display: block; 
+ font-size: 20px;
+ overflow-x: auto;
+ white-space: pre-wrap;
+ }
+ .controls {
+ height: 80px; 
+ background: #ffffff; 
+ border-top: 1px solid #dee2e6;
+ display: flex; 
+ justify-content: space-between; 
+ align-items: center; 
+ padding: 0 50px;
+ }
+ button {
+ background: #0d6efd; 
+ color: white; 
+ border: none; 
+ padding: 12px 25px;
+ font-size: 18px; 
+ border-radius: 8px; 
+ cursor: pointer;
+ transition: background 0.2s;
+ }
+ button:hover {
+ background: #0b5ed7;
+ }
+ button:disabled { 
+ background: #adb5bd; 
+ cursor: not-allowed; 
+ }
+ .progress { 
+ font-size: 20px; 
+ font-weight: bold; 
+ color: #495057;
+ }
+ .slide-label { font-weight: bold; text-transform: uppercase; color: #6c757d; margin-bottom: 20px; font-size: 18px; letter-spacing: 1px; }
+ .callout { padding: 20px 30px; border-radius: 8px; margin: 20px 0; border-left: 8px solid; }
+ .callout.blue { background: #cce5ff; border-color: #004085; color: #004085; }
+ .callout.green { background: #d4edda; border-color: #155724; color: #155724; }
+ .callout.red { background: #f8d7da; border-color: #721c24; color: #721c24; }
+ .callout.yellow { background: #fff3cd; border-color: #856404; color: #856404; }
+ .section-header { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; }
+ .section-num { font-size: 80px; font-weight: bold; color: #e9ecef; margin-bottom: -20px; }
+ .section-header h2 { font-size: 48px; color: #0d6efd; margin-bottom: 20px; }
+ img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; border: 1px solid #dee2e6; }
+ table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 20px; }
+ th, td { border: 1px solid #dee2e6; padding: 12px; text-align: left; }
+ th { background-color: #e9ecef; color: #0d6efd; }
+</style>
+</head>
+<body>
+ <div class="slide-container" id="slides">
+
+ <div class="slide active">
+ <div class="slide-label">Aula 07</div>
+ <h1>Aula 07 - Funções, Escopo e Manipulação de Dados</h1>
+ <p><strong>Descrição:</strong> Modularização de código, passagem de parâmetros, retorno de funções e tratamento básico de arrays/estruturas.</p>
+ <p><strong>Objetivo Geral:</strong> Capacitar os estudantes a estruturar código C modularizado, seguro e eficiente para microcontroladores, dominando o gerenciamento de escopo, passagem de parâmetros por referência e tratamento de arrays e estruturas sem alocação dinâmica de memória.</p>
+ </div>
+ 
+ <div class="slide">
+ <h2>Introdução</h2>
+ <p>Vamos organizar um programa em C em pedaços menores (módulos), onde cada variável "mora" na memória do microcontrolador, como passar dados entre funções sem gastar memória à toa, e por que não podemos usar malloc() em sistemas embarcados.</p>
+ <p>Ao final desta aula, você vai conseguir dividir um programa em arquivos .h e .c, escolher corretamente onde uma variável deve "morar" (static, volatile, const), passar dados grandes entre funções sem desperdiçar memória, e entender por que a indústria embarcada evita alocação dinâmica.</p>
+ </div>
+
+ <div class="slide">
+ <div class="section-header">
+ <div class="section-num">01</div>
+ <h2>Bloco 1 — Modularização: por que dividir o código em pedaços?</h2>
+ </div>
+ </div>
+
+ <div class="slide">
+ <h2>1. Modularização: por que dividir o código em pedaços?</h2>
+ <p>Imagine escrever um programa inteiro (sensores, comunicação, motores, telas) em um único arquivo main.c com 5 mil linhas. Encontrar um erro nesse arquivo seria como procurar uma agulha no palheiro. A solução é dividir o sistema em módulos: grupos de código que cuidam de uma responsabilidade só (por exemplo, "tudo que envolve o sensor de temperatura").</p>
+ <div class="callout blue">
+ <strong>Pense em um restaurante</strong><br>
+ O arquivo .h é o cardápio: mostra ao cliente (o resto do programa) o que está disponível, sem revelar a receita.<br>
+ O arquivo .c é a cozinha: é onde a comida realmente é preparada. O cliente não precisa saber como o prato é feito — só precisa saber o que pode pedir.
+ </div>
+ </div>
+
+ <div class="slide">
+ <h2>1.1 Arquivo de cabeçalho (.h) - a interface pública</h2>
+ <p>O .h contém apenas o que outros arquivos precisam enxergar: os protótipos das funções (o "nome e os ingredientes" de cada função, sem o código de dentro) e os tipos de dados (struct, typedef) usados por quem vai chamar essas funções.</p>
+ 
+ <h2>1.2 Arquivo de implementação (.c) - a lógica privada</h2>
+ <p>O .c contém o código real das funções — o "como" — além de variáveis que só aquele módulo precisa usar internamente.</p>
+ 
+ <h2>1.3 Include guards: evitando que o cardápio seja lido duas vezes</h2>
+ <p>Se dois arquivos diferentes incluírem o mesmo .h, o compilador pode tentar definir a mesma struct duas vezes e travar com erro de redefinição. As diretivas #ifndef, #define e #endif funcionam como uma etiqueta "já lido": na primeira vez que o arquivo é incluído, o compilador cola a etiqueta; nas próximas vezes, ao ver a etiqueta já colada, ele simplesmente pula o conteúdo.</p>
+ </div>
+
+ <div class="slide">
+ <h2>Exemplos de código</h2>
+ <h1>sensor_temp.h</h1>
+<pre><code>/* sensor_temp.h - Interface Pública (o cardápio) */
+#ifndef SENSOR_TEMP_H // "Já colei essa etiqueta antes?"
+#define SENSOR_TEMP_H // Se não, cola a etiqueta agora
+
+#include &lt;stdint.h&gt; // tipos inteiros com tamanho garantido (uint8_t, uint16_t...)
+#include &lt;stdbool.h&gt; // tipo booleano (true, false)
+
+typedef struct {
+  uint8_t id_sensor;
+  float temperatura_celsius;
+  bool leitura_valida;
+} sensor_temp_t;
+
+void sensor_temp_init(void);
+bool sensor_temp_ler(sensor_temp_t * const p_sensor);
+
+#endif /* SENSOR_TEMP_H */</code></pre>
+ </div>
+
+ <div class="slide">
+ <h2>Exemplos de código (Continuação)</h2>
+  <h1>sensor_temp.c</h1>
+<pre><code>/* sensor_temp.c - Implementação Privada (a cozinha) */
+#include "sensor_temp.h"
+#include &lt;stddef.h&gt;
+
+// 'static' = função privada: só este arquivo enxerga
+static float converter_adc_para_celsius(uint16_t valor_adc) {
+  return ((float)valor_adc * 3.3f / 4095.0f) * 100.0f;
+}
+
+void sensor_temp_init(void) {
+  /* configura o hardware do sensor */
+}
+
+bool sensor_temp_ler(sensor_temp_t * const p_sensor) {
+  if (p_sensor == NULL) return false; // nunca confie no ponteiro recebido
+  
+  uint16_t valor_bruto_adc = 2048; // leitura simulada
+  p_sensor-&gt;temperatura_celsius = converter_adc_para_celsius(valor_bruto_adc);
+  p_sensor-&gt;leitura_valida = true;
+  
+  return true;
+}</code></pre>
+ </div>
+
+ <div class="slide">
+ <div class="section-header">
+ <div class="section-num">02</div>
+ <h2>Bloco 2 — Onde cada variável "mora": o mapa da memória</h2>
+ </div>
+ </div>
+
+ <div class="slide">
+ <h2>2. Onde cada variável "mora": o mapa da memória</h2>
+ <p>Todo microcontrolador tem dois tipos de memória principais: a Flash e a SRAM.</p>
+ <p>A memória Flash e a SRAM desempenham papéis diferentes nos computadores e aparelhos eletrônicos. A memória Flash guarda arquivos e programas de forma permanente (mesmo sem energia), enquanto a SRAM funciona como uma memória de trabalho ultrarrápida e volátil (apaga ao desligar) usada pelo processador. Entender a diferença entre elas é a chave para entender static, const e volatile.</p>
+ <div class="callout blue">
+ <strong>Flash é um caderno impresso, SRAM é um quadro branco</strong><br>
+ A Flash guarda dados de forma permanente — como um livro impresso: mesmo desligando o microcontrolador, o conteúdo continua lá. A SRAM é como um quadro branco: rápida de escrever e apagar, mas o conteúdo some quando a energia acaba.
+ </div>
+ </div>
+
+ <div class="slide">
+ <h2>O compilador organiza o programa em 5 "gavetas" de memória:</h2>
+ <table>
+ <tr>
+ <th>Gaveta (seção)</th>
+ <th>O que guarda e onde fica</th>
+ </tr>
+ <tr>
+ <td><strong>.text (Flash)</strong></td>
+ <td>O código compilado, em linguagem de máquina. Só leitura — como as letras já impressas em um livro.</td>
+ </tr>
+ <tr>
+ <td><strong>.rodata (Flash)</strong></td>
+ <td>Constantes (const) e textos fixos. Ficam na Flash para não gastar SRAM à toa.</td>
+ </tr>
+ <tr>
+ <td><strong>.data (SRAM, cópia vem da Flash)</strong></td>
+ <td>Variáveis globais/estáticas já inicializadas com um valor diferente de zero (ex: int limite = 50;). O valor nasce na Flash e é copiado para a SRAM quando a placa liga.</td>
+ </tr>
+ <tr>
+ <td><strong>.bss (SRAM)</strong></td>
+ <td>Variáveis globais/estáticas sem valor inicial (ou iniciadas em zero). O sistema simplesmente zera esse espaço ao ligar.</td>
+ </tr>
+ <tr>
+ <td><strong>Stack / Pilha (SRAM)</strong></td>
+ <td>Variáveis locais e parâmetros de função. Funciona como uma pilha de pratos: cada função empilha seu prato ao ser chamada e o retira ao terminar.</td>
+ </tr>
+ </table>
+ </div>
+
+ <div class="slide">
+ <h2>2.1 Os três qualificadores que todo firmware usa</h2>
+ <h3>static (dentro de um arquivo) = sala trancada</h3>
+ <p>static em uma variável ou função global esconde esse nome do resto do projeto — só o próprio arquivo .c tem a chave dessa sala. Isso evita que outro módulo mexa em algo que não é da conta dele.</p>
+ 
+ <h3>static (dentro de uma função) = post-it que a função deixa colado</h3>
+ <p>Normalmente, uma variável local nasce e morre a cada chamada da função. Com static, a função escreve o valor em um post-it (na SRAM) antes de terminar, e na próxima chamada ela lê esse mesmo post-it em vez de começar do zero. É assim que um contador "lembra" quantas vezes já foi chamado.</p>
+ </div>
+ 
+ <div class="slide">
+  <h2>2.1 Os três qualificadores (Continuação)</h2>
+ <h3>volatile = "não confie na memória, vá lá conferir de novo"</h3>
+ <p>Por padrão, o compilador tenta ser esperto: se ele acha que uma variável não mudou, reutiliza o último valor que já tinha guardado, para ganhar velocidade. O problema é que registradores de hardware e interrupções podem mudar um valor sem o compilador perceber. volatile avisa: "não confie na memória cache, vá até o endereço físico e leia de novo, sempre".</p>
+ 
+ <h3>const = etiqueta de "isto nunca muda"</h3>
+ <p>Além de impedir que o código altere o valor por engano, const em uma variável global faz o compilador guardá-la direto na Flash (.rodata) em vez de gastar SRAM — útil porque a SRAM costuma ser bem mais escassa que a Flash.</p>
+</div>
+
+ <div class="slide">
+ <h2>2.1 Os três qualificadores (Continuação)</h2>
+<pre><code>#include &lt;stdint.h&gt;
+
+// Registrador do ADC mapeado no endereço físico 0x40012000
+// 'volatile' = o hardware pode mudar esse valor a qualquer momento
+#define REG_STATUS_ADC (*((volatile uint32_t *) 0x40012000U))
+
+// Tabela que nunca muda -&gt; fica guardada na Flash, não na SRAM
+static const float TABELA_CALIBRACAO[3] = {1.02f, 0.98f, 1.00f};
+
+uint32_t registrar_evento(void) {
+  // 'static' aqui = a contagem sobrevive entre uma chamada e outra
+  static uint32_t total_execucoes = 0U;
+  return ++total_execucoes;
+}
+
+void aguardar_conversao_hardware(void) {
+  // sem 'volatile' o compilador poderia "decorar" esse valor e
+  // nunca sair do laço, mesmo o hardware já tendo mudado o registrador
+  while ((REG_STATUS_ADC &amp; 0x01U) == 0U) { /* aguardando... */ }
+}</code></pre>
+ </div>
+
+ <div class="slide">
+ <div class="section-header">
+ <div class="section-num">03</div>
+ <h2>Bloco 3 — Funções e ponteiros: como entregar dados sem desperdiçar memória</h2>
+ </div>
+ </div>
+
+ <div class="slide">
+ <h2>3. Funções e ponteiros</h2>
+ <div class="callout yellow">
+ <strong>Passar por valor = enviar uma fotocópia. Passar por ponteiro = enviar o endereço da casa</strong>
+ <p>Passar por valor cria uma cópia inteira da variável na pilha. Se a variável for uma struct grande, isso custa memória e tempo. Passar por ponteiro envia só o endereço (4 bytes em um microcontrolador de 32 bits) — como entregar o endereço da casa em vez de reconstruir a casa inteira em outro lugar.</p>
+  </div>
+ 
+ <h2>3.1 O perigo do ponteiro pendente (dangling pointer)</h2>
+ <p>Nunca devolva o endereço de uma variável local criada dentro da função. Quando a função termina, a pilha "desmonta" aquele espaço — é como demolir uma casa e continuar usando o endereço dela no GPS: o ponteiro aponta para lixo de memória, e isso pode travar o microcontrolador (Hard Fault).</p>
+ </div>
+
+ <div class="slide">
+ <h2>3.2 A solução: o chamador entrega o balde vazio</h2>
+ <p>Em vez de a função criar o dado e tentar devolvê-lo, é o código que chama a função (o "chamador") quem reserva o espaço e passa o ponteiro para a função apenas preencher. Esse padrão se chama Caller-Allocated Buffer — como levar seu próprio pote reutilizável para a lanchonete: o pote (a memória) já existe e continua existindo depois; a função só o enche.</p>
+<pre><code>#include &lt;stdint.h&gt;
+#include &lt;stdbool.h&gt;
+#include &lt;stddef.h&gt;
+
+typedef struct {
+  uint32_t leitura_pressao;
+  uint32_t timestamp;
+} dados_pressao_t;
+
+// CORRETO: quem chama entrega a struct (o 'balde'),
+// a função só preenche os dados dentro dele
+bool ler_pressao_seguro(dados_pressao_t * const p_saida) {
+  if (p_saida == NULL) return false; // proteção contra ponteiro nulo
+  
+  p_saida-&gt;leitura_pressao = 1013U;
+  p_saida-&gt;timestamp = 5000U;
+  return true;
+}</code></pre>
+ </div>
+
+ <div class="slide">
+ <div class="section-header">
+ <div class="section-num">04</div>
+ <h2>Bloco 4 — Arrays e structs: tamanho e organização importam</h2>
+ </div>
+ </div>
+
+ <div class="slide">
+ <h2>4. Arrays e structs: tamanho e organização importam</h2>
+ <h2>4.1 Array decay: o array "esquece" seu próprio tamanho</h2>
+ <p>Quando um array é passado para uma função, ele vira apenas um ponteiro para o primeiro elemento — a informação de "quantos elementos ele tinha" se perde no caminho. Por isso, é preciso sempre enviar o tamanho junto, em um parâmetro separado (size_t tamanho).</p>
+ 
+ <h2>4.2 Padding: por que a ordem dos campos de uma struct muda o tamanho dela</h2>
+ <p>Processadores de 32 bits leem a memória em blocos alinhados de 4 bytes. Se os campos de uma struct estiverem em uma ordem "desorganizada" (misturando tamanhos pequenos e grandes), o compilador insere bytes de preenchimento invisíveis (padding) para manter esse alinhamento — e a struct acaba maior do que o necessário.</p>
+ <div class="callout green">
+ <strong>Organizando a mala de viagem</strong><br>
+ Imagine guardar objetos grandes e pequenos em uma mala sem planejamento: sobram buracos entre eles. Se você primeiro coloca os objetos grandes e só depois encaixa os pequenos nos espaços que sobraram, a mala fica muito mais compacta. Com structs é a mesma lógica: declarar os campos do maior para o menor evita espaço desperdiçado.
+ </div>
+ </div>
+
+ <div class="slide">
+ <h2>4. Arrays e structs (Código)</h2>
+<pre><code>// Ocupa 12 bytes na RAM (o compilador insere 6 bytes de padding)
+struct Desalinhada {
+  uint8_t id; // 1 byte (+3 bytes de padding invisível)
+  uint32_t valor; // 4 bytes
+  uint8_t status; // 1 byte (+ 3 bytes de padding no final)
+};
+
+// Ocupa só 8 bytes: do maior campo para o menor
+struct Otimizada {
+  uint32_t valor; // 4 bytes
+  uint8_t id; // 1 byte
+  uint8_t status; // 1 byte (+ 2 bytes de padding no final)
+};
+
+// Função que recebe um array: sempre com ponteiro + tamanho
+float calcular_media(const uint16_t * const p_array, const size_t tamanho) {
+  if (p_array == NULL || tamanho == 0U) return 0.0f;
+  
+  uint32_t soma = 0U;
+  for (size_t i = 0U; i &lt; tamanho; ++i) {
+    soma += p_array[i];
+  }
+  return (float)soma / (float)tamanho;
+}</code></pre>
+ </div>
+
+ <div class="slide">
+ <div class="section-header">
+ <div class="section-num">05</div>
+ <h2>Bloco 5 — Por que malloc é proibido em sistemas embarcados</h2>
+ </div>
+ </div>
+
+ <div class="slide">
+ <h2>5. Por que malloc é proibido em sistemas embarcados</h2>
+ <p>Em um computador comum, malloc() e free() criam e apagam variáveis dinamicamente na memória Heap. Em sistemas embarcados críticos (carros, aviões, dispositivos médicos), isso é proibido pelas diretrizes MISRA C (Diretiva 4.12 e Regra 21.3). Três motivos principais:</p>
+ <ul>
+ <li><strong>Imprevisibilidade:</strong> o tempo que o malloc leva para achar espaço livre varia a cada chamada — ruim para sistemas que precisam responder em tempo real.</li>
+ <li><strong>Fragmentação:</strong> alocar e liberar blocos de tamanhos diferentes deixa "buracos" na memória, podendo faltar espaço contínuo mesmo havendo memória livre no total.</li>
+ <li><strong>Risco de colisão:</strong> um vazamento de memória pode fazer o Heap crescer até colidir com a Stack, travando o hardware sem aviso.</li>
+ </ul>
+ <div class="callout red">
+ <strong>Estacionamento com vagas numeradas em vez de "fila livre"</strong><br>
+ malloc() é como deixar os carros estacionarem em qualquer espaço livre que encontrarem: rápido no começo, mas com o tempo sobram vãos pequenos demais para um carro grande — mesmo havendo espaço total de sobra. A alternativa segura é ter vagas numeradas de tamanho fixo: cada carro pega uma vaga inteira, e devolvê-la é instantâneo e previsível. Isso é o pool de memória estática.
+ </div>
+ </div>
+
+ <div class="slide">
+ <h2>5. Pool de Memória Estática (Código)</h2>
+<pre><code>#define TAMANHO_BLOCO 32U
+#define TOTAL_BLOCOS 8U
+
+typedef struct {
+  uint8_t memoria[TOTAL_BLOCOS][TAMANHO_BLOCO]; // pré-alocado na RAM
+  bool ocupado[TOTAL_BLOCOS];
+} pool_memoria_t;
+
+// Reserva um bloco em tempo fixo e previsível: O(1)
+void* pool_alocar(pool_memoria_t * const pool) {
+  if (pool == NULL) return NULL;
+  
+  for (size_t i = 0; i &lt; TOTAL_BLOCOS; ++i) {
+    if (!pool-&gt;ocupado[i]) {
+      pool-&gt;ocupado[i] = true;
+      return (void*)&amp;(pool-&gt;memoria[i][0]);
+    }
+  }
+  return NULL; // memória esgotada, com segurança, sem travar o sistema
+}</code></pre>
+ </div>
+
+ <div class="slide">
+ <h2>Resumo rápido</h2>
+ <table>
+ <tr>
+ <th>Conceito</th>
+ <th>Em uma frase</th>
+ </tr>
+ <tr>
+ <td><strong>.h vs .c</strong></td>
+ <td>Cardápio (interface) vs. cozinha (implementação).</td>
+ </tr>
+ <tr>
+ <td><strong>Include guard</strong></td>
+ <td>Etiqueta "já lido" que evita erro de redefinição.</td>
+ </tr>
+ <tr>
+ <td><strong>static (arquivo)</strong></td>
+ <td>Sala trancada: só aquele arquivo acessa.</td>
+ </tr>
+ <tr>
+ <td><strong>static (função)</strong></td>
+ <td>Post-it que sobrevive entre chamadas.</td>
+ </tr>
+ <tr>
+ <td><strong>volatile</strong></td>
+ <td>"Vá conferir de novo, não confie no que já leu".</td>
+ </tr>
+ <tr>
+ <td><strong>const</strong></td>
+ <td>"Isto nunca muda" — geralmente vai para a Flash.</td>
+ </tr>
+ <tr>
+ <td><strong>Ponteiro pendente</strong></td>
+ <td>Endereço de uma casa já demolida.</td>
+ </tr>
+ <tr>
+ <td><strong>Caller-allocated buffer</strong></td>
+ <td>Leve seu próprio pote; a função só o enche.</td>
+ </tr>
+ <tr>
+ <td><strong>Array decay</strong></td>
+ <td>O array esquece seu tamanho ao entrar em uma função.</td>
+ </tr>
+ <tr>
+ <td><strong>Padding</strong></td>
+ <td>Buracos de alinhamento; organize do maior campo para o menor.</td>
+ </tr>
+ <tr>
+ <td><strong>malloc proibido</strong></td>
+ <td>Vagas fixas numeradas em vez de estacionamento livre.</td>
+ </tr>
+ </table>
+ </div>
+
+ </div>
+
+ <div class="controls">
+ <button id="prevBtn" onclick="prevSlide()" disabled>Anterior</button>
+ <div class="progress"><span id="current">1</span> / <span id="total"></span></div>
+ <button id="nextBtn" onclick="nextSlide()">Próximo</button>
+ </div>
+
+ <script>
+ let currentSlideIndex = 0;
+ const slides = document.querySelectorAll('.slide');
+ const totalSlides = slides.length;
+ const currentIndicator = document.getElementById('current');
+ const totalIndicator = document.getElementById('total');
+ const prevBtn = document.getElementById('prevBtn');
+ const nextBtn = document.getElementById('nextBtn');
+
+ totalIndicator.textContent = totalSlides;
+
+ function updateView() {
+ slides.forEach((slide, index) => {
+ slide.classList.remove('active');
+ if (index === currentSlideIndex) {
+ slide.classList.add('active');
+ }
+ });
+ currentIndicator.textContent = currentSlideIndex + 1;
+ 
+ prevBtn.disabled = currentSlideIndex === 0;
+ nextBtn.disabled = currentSlideIndex === totalSlides - 1;
+ }
+
+ function nextSlide() {
+ if (currentSlideIndex < totalSlides - 1) {
+ currentSlideIndex++;
+ updateView();
+ }
+ }
+
+ function prevSlide() {
+ if (currentSlideIndex > 0) {
+ currentSlideIndex--;
+ updateView();
+ }
+ }
+
+ document.addEventListener('keydown', (e) => {
+ if (e.key === 'ArrowRight' || e.key === 'PageDown') nextSlide();
+ if (e.key === 'ArrowLeft' || e.key === 'PageUp') prevSlide();
+ });
+ </script>
+</body>
+</html>

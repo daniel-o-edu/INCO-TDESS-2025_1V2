@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aula 06 - Estruturas Condicionais, Repetição e Controle em IoT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Fundo claro */
+            color: #0f172a; /* Letras escuras */
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Tipografia responsiva usando clamp */
+        h1, h2, h3 {
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 0.5em;
+            color: #0d6efd;
+        }
+        
+        h1 { font-size: clamp(2.5rem, 4vw, 4.5rem); }
+        h2 { font-size: clamp(2rem, 3.5vw, 3.5rem); }
+        
+        p, li, div {
+            font-size: clamp(1.4rem, 2.2vw, 2.5rem);
+            line-height: 1.6;
+        }
+
+        .slide {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            justify-content: center;
+            padding: 5vh 8vw;
+            box-sizing: border-box;
+            animation: fadeIn 0.4s ease-in-out;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Realce para código inline */
+        code {
+            background-color: #e2e8f0;
+            color: #b91c1c;
+            padding: 0.1em 0.3em;
+            border-radius: 0.2em;
+            font-family: monospace;
+            font-weight: bold;
+        }
+
+        strong {
+            color: #0f172a;
+        }
+
+        ul, ol {
+            padding-left: 2em;
+            margin-bottom: 1em;
+        }
+
+        li {
+            margin-bottom: 0.8em;
+        }
+
+        /* Controles de navegação */
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 15px;
+            z-index: 50;
+        }
+
+        .btn {
+            background-color: #334155;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.2s, transform 0.1s;
+            font-weight: 600;
+        }
+
+        .btn:hover { background-color: #1e293b; }
+        .btn:active { transform: scale(0.95); }
+        .btn:disabled { background-color: #cbd5e1; cursor: not-allowed; transform: none; }
+
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 8px;
+            background-color: #2563eb;
+            transition: width 0.3s ease-out;
+            z-index: 50;
+        }
+        
+        .slide-counter {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #64748b;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Slide 1 -->
+    <div class="slide active">
+        <h1 class="text-blue-900">Aula 06 - Estruturas Condicionais, Repetição e Controle em IoT</h1>
+        <p class="mt-6 border-l-8 border-blue-600 pl-6 bg-white p-6 rounded shadow-sm">
+            <strong>Descrição:</strong> Implementação e validação de estruturas de decisão (<code>if/else</code>, <code>switch/case</code>) e laços (<code>for</code>, <code>while</code>) no simulador virtual de IoT.
+        </p>
+    </div>
+
+    <!-- Slide 2 -->
+    <div class="slide">
+        <h2>1. Abertura e Apresentação do Problema</h2>
+        <h3 class="text-blue-800 mt-4">O Caso AgroTech: O Resgate da Estufa Inteligente</h3>
+        <p>A empresa de agrotecnologia <em>AgroSmart</em> contratou sua equipe para reformular o firmware do controlador de uma estufa automatizada. O dispositivo atual apresenta graves falhas operacionais:</p>
+    </div>
+
+    <!-- Slide 3 -->
+    <div class="slide">
+        <h2>1. Abertura (Cont.)</h2>
+        <ol class="list-decimal space-y-6">
+            <li><strong>Travamentos Frequentes:</strong> O sistema para de responder e perde a conexão Wi-Fi porque o código antigo utiliza pausas completas do processador para contar tempo.</li>
+            <li><strong>Falhas de Segurança:</strong> Quando a temperatura atinge níveis críticos, o sistema demora a reagir porque fica preso dentro de loops de leitura secundários.</li>
+            <li><strong>Corrupção de Registradores:</strong> Ao tentar ligar a bomba de água, o código antigo reescreve todo o byte de memória, alterando acidentalmente as configurações dos sensores de umidade.</li>
+        </ol>
+    </div>
+
+    <!-- Slide 4 -->
+    <div class="slide">
+        <h2>1. Abertura (Missão)</h2>
+        <div class="bg-blue-50 border-l-8 border-blue-500 p-8 rounded shadow">
+            <p><strong>Sua Missão Hoje:</strong> Até o final desta aula, sua equipe deverá projetar, programar e depurar um novo firmware seguro em C para a estufa no simulador virtual (<a href="https://www.onlinegdb.com/" target="_blank" class="text-blue-600 underline">https://www.onlinegdb.com/</a>).</p>
+            <p class="mt-4">Para construir essa solução, você aprenderá e aplicará as ferramentas técnicas a seguir.</p>
+        </div>
+    </div>
+
+    <!-- Slide 5 -->
+    <div class="slide">
+        <h2>2. Ferramentas Técnicas I: Manipulação de Bits (Bitwise) e Registradores</h2>
+        <p>Para controlar o hardware da estufa sem gastar memória excessiva nem corromper dados, utilizaremos operações no nível de bit.</p>
+    </div>
+
+    <!-- Slide 6 -->
+    <div class="slide">
+        <h2>2.1 Aritmética de Bits e Operadores em C</h2>
+        <p>Os operadores bit-a-bit realizam cálculos diretamente na representação binária (0s e 1s) dos números.</p>
+        <ul class="list-disc mt-4">
+            <li><strong>AND (<code>&</code>) — Máscara de Leitura:</strong> O bit resultante será 1 apenas se ambos os bits comparados forem 1.
+                <br><span class="text-gray-600 italic text-xl sm:text-2xl mt-2 block">Aplicação na Estufa: Usado para <strong>isolar</strong> um bit específico e verificar se um pino de hardware ou flag de sensor está ativo.</span>
+            </li>
+            <li class="mt-6"><strong>OR (<code>|</code>) — Ativação de Bits (Set):</strong> O bit resultante será 1 se pelo menos um dos bits for 1.
+                <br><span class="text-gray-600 italic text-xl sm:text-2xl mt-2 block">Aplicação na Estufa: A ferramenta ideal para <strong>"ligar"</strong> um bit específico (ex: ativar a bomba de água) sem alterar os outros bits do registrador.</span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Slide 7 -->
+    <div class="slide">
+        <h2>2.1 Aritmética de Bits e Operadores em C (Cont.)</h2>
+        <ul class="list-disc">
+            <li><strong>XOR (<code>^</code>) — Inversão de Estado (Toggle):</strong> O bit resultante será 1 se os bits comparados forem diferentes.
+                <br><span class="text-gray-600 italic text-xl sm:text-2xl mt-2 block">Aplicação na Estufa: Usado para <strong>alternar</strong> o estado de um bit (se é 0 vira 1, se é 1 vira 0). Ótimo para fazer um LED de status piscar.</span>
+            </li>
+            <li class="mt-6"><strong>NOT (<code>~</code>) — Inversão Total:</strong> Operador unário que inverte todos os bits do valor (transforma 0 em 1 e 1 em 0).</li>
+            <li class="mt-6"><strong>Deslocamentos (<code>&lt;&lt;</code> e <code>&gt;&gt;</code>):</strong> Movem os bits de um valor N posições para a esquerda ou para a direita.
+                <ul class="list-circle ml-8 mt-2 text-gray-700">
+                    <li>Deslocar 1 posição para a esquerda (<code>&lt;&lt; 1</code>) equivale a <strong>multiplicar por 2</strong>.</li>
+                    <li>Deslocar 1 posição para a direita (<code>&gt;&gt; 1</code>) equivale a uma <strong>divisão inteira por 2</strong>.</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Slide 8 -->
+    <div class="slide">
+        <h2>2.2 Mapeamento de Memória e Registradores</h2>
+        <p>Por que alteramos bits individuais em vez de mudar bytes inteiros?</p>
+        <p class="mt-4">Em microcontroladores e sistemas de IoT, os periféricos de hardware são mapeados diretamente no mesmo espaço da memória RAM. Um único endereço de memória (um byte de 8 bits) gerencia vários componentes ao mesmo tempo (por exemplo: Bit 0 = Umidade, Bit 1 = Bomba, Bit 2 = Alerta Térmico).</p>
+        <div class="bg-yellow-50 border-l-8 border-yellow-500 p-6 mt-6 rounded">
+            <p>Se alterássemos o byte inteiro para ligar a bomba, poderíamos acidentalmente desligar a leitura do sensor de umidade. O uso de <strong>máscaras de bits</strong> garante que alteramos apenas o recurso desejado, preservando a integridade do sistema.</p>
+        </div>
+    </div>
+
+    <!-- Slide 9 -->
+    <div class="slide">
+        <h2>3. Ferramentas Técnicas II: Lógica de Decisão e Estruturação de Código</h2>
+        <h3 class="mt-6 text-blue-800">3.1 Tomada de Decisão Booleana (<code>if</code>, <code>else if</code>, <code>else</code>)</h3>
+        <p>O controle de fluxo permite ao programa escolher caminhos com base em condições.</p>
+        <ul class="list-disc mt-4">
+            <li><strong><code>if</code> / <code>else</code>:</strong> Executa um bloco de código se a condição for verdadeira; o <code>else</code> trata o caminho alternativo.</li>
+            <li><strong><code>else if</code>:</strong> Encadeia verificações para tratar múltiplos caminhos possíveis.</li>
+            <li><strong>Avaliação Booleana em C:</strong> A linguagem C considera o valor <strong>Zero como FALSO</strong> e <strong>qualquer valor Diferente de Zero como VERDADEIRO</strong>.</li>
+        </ul>
+    </div>
+
+    <!-- Slide 10 -->
+    <div class="slide">
+        <h2>3.2 Combinação de Operadores Lógicos e Bitwise</h2>
+        <p>Podemos testar condições lógicas (<code>&&</code>, <code>||</code>, <code>!</code>) juntamente com operações em bits (<code>&</code>, <code>|</code>).</p>
+        <div class="bg-red-50 border-l-8 border-red-500 p-6 mt-6 rounded shadow-sm">
+            <p><strong>Atenção à Precedência:</strong> Os operadores bitwise (<code>&</code>, <code>|</code>) possuem <strong>maior precedência</strong> (são processados antes) que os operadores lógicos (<code>&&</code>, <code>||</code>). Isso permite filtrar um bit com uma máscara <code>&</code> e checar o resultado dentro de uma estrutura <code>if</code> na mesma linha.</p>
+        </div>
+    </div>
+
+    <!-- Slide 11 -->
+    <div class="slide">
+        <h2>3.3 Código Limpo: Cláusulas de Guarda (<em>Guard Clauses</em>)</h2>
+        <p>O acúmulo de múltiplos ifs aninhados (um dentro do outro) prejudica a leitura e a manutenção do código.</p>
+        <ul class="list-disc mt-6">
+            <li><strong>Técnica da Cláusula de Guarda:</strong> Trata e interrompe erros precocemente. Em vez de envolver todo o código do programa em um bloco <code>if</code> gigante, testamos a condição de emergência logo nas primeiras linhas e interrompemos o fluxo com <code>return</code> ou alteração direta de estado.</li>
+            <li class="mt-4"><span class="text-gray-600 italic">Uso na Estufa:</span> Se o sensor indicar superaquecimento, a cláusula de guarda é acionada na hora, impedindo que o código tente irrigar a planta antes de tratar o risco térmico.</li>
+        </ul>
+    </div>
+
+    <!-- Slide 12 -->
+    <div class="slide">
+        <h2>3.4 Decisão Múltipla Otimizada (<code>switch</code> / <code>case</code>)</h2>
+        <p>O comando <code>switch</code> é uma estrutura de seleção usada para comparar uma única variável com múltiplos valores constantes preestabelecidos.</p>
+        <ul class="list-disc mt-6">
+            <li><strong><code>switch</code> e <code>case</code>:</strong> A variável (de tipo inteiro <code>int</code> ou caractere <code>char</code>) é comparada com os valores de cada <code>case</code>.</li>
+            <li><strong><code>break</code>:</strong> Interrompe a execução assim que um <code>case</code> correspondente é executado. Sem o <code>break</code>, o programa continuará executando os comandos dos <code>case</code> abaixo.</li>
+            <li><strong><code>default</code>:</strong> O caminho padrão executado se nenhuma opção for satisfeita.</li>
+        </ul>
+    </div>
+
+    <!-- Slide 13 -->
+    <div class="slide">
+        <h2>3.4 Decisão Múltipla Otimizada (Cont.)</h2>
+        <ul class="list-disc">
+            <li><strong>Desempenho Otimizado (Tabelas de Desvio / <em>Jump Tables</em>):</strong> Diferente de uma longa cadeia de <code>else if</code>, o compilador converte o <code>switch</code> em uma tabela de saltos em memória, tornando a transição de estados instantânea.</li>
+            <li class="mt-8"><strong>Modelagem de Máquina de Estados:</strong> É a ferramenta perfeita para gerenciar modos de operação.
+                <ul class="list-circle ml-8 mt-4">
+                    <li>Exemplo de Estados: MONITORAMENTO, IRRIGAÇÃO e ALERTA.</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Slide 14 -->
+    <div class="slide">
+        <h2>4. Ferramentas Técnicas III: Laços de Repetição, Confiabilidade e Tempo</h2>
+        <h3 class="mt-6 text-blue-800">4.1 Laço Contado (<code>for</code>)</h3>
+        <p>Concentra a inicialização, condição de parada e incremento em uma única linha.</p>
+        <ul class="list-disc mt-4">
+            <li><strong>Anatomia:</strong> <code>for (inicialização; condição_de_parada; incremento)</code>.</li>
+            <li class="mt-4"><strong>Aplicações em IoT:</strong>
+                <ul class="list-circle ml-8 mt-2 space-y-2">
+                    <li><strong>Varredura e Média de Sensores:</strong> Executa um número fixo de leituras de um sensor para calcular a média aritmética e descartar ruídos elétricos.</li>
+                    <li><strong>Buffers de Comunicação:</strong> Percorre arrays de memória para organizar dados antes da transmissão.</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Slide 15 -->
+    <div class="slide">
+        <h2>4.2 Laços Condicionais Baseados em Estado (<code>while</code> e <code>do-while</code>)</h2>
+        <p>Usados quando não sabemos previamente quantas vezes a repetição acontecerá.</p>
+        <ul class="list-disc mt-6">
+            <li><strong><code>while</code> (Verificação no Início):</strong> Testa a condição antes de rodar o bloco. Se a condição for falsa na chegada, o código interno <strong>nunca é executado</strong>. Ideal para rotinas de espera por sensores.</li>
+            <li class="mt-4"><strong><code>do-while</code> (Verificação no Fim):</strong> Executa o bloco de código primeiro e só depois testa a condição. Garante a execução <strong>pelo menos uma vez</strong>. Perfeito para rotinas de calibração de sensores ou tentativas de conexão ao Wi-Fi.</li>
+            <li class="mt-4"><strong>Flags de Controle:</strong> Variáveis que sinalizam o momento de interromper um laço para evitar que ele fique preso para sempre.</li>
+        </ul>
+    </div>
+
+    <!-- Slide 16 -->
+    <div class="slide">
+        <h2>4.3 Segurança e o Arquétipo do <em>Super Loop</em></h2>
+        <ul class="list-disc space-y-6">
+            <li><strong>Loops Infinitos Indesejados:</strong> Ocorrem quando o programador esquece de atualizar a variável de controle dentro do laço, travando o processador.</li>
+            <li><strong>Super Loop Proposital (<code>while(1)</code> ou <code>for(;;)</code>):</strong> A espinha dorsal da programação de firmware. Dispositivos de IoT não possuem sistema operacional para "fechar o programa"; eles devem rodar continuamente enquanto houver energia.</li>
+            <li><strong>O Perigo do Bloqueio de Código (<em>Blocking Code</em>):</strong> Se o firmware ficar preso dentro de uma tarefa longa, o envio de dados pela rede Wi-Fi e os alarmes de emergência deixarão de funcionar.</li>
+        </ul>
+    </div>
+
+    <!-- Slide 17 -->
+    <div class="slide">
+        <h2>4.4 Depuração Embarcada (<em>Debugging</em>)</h2>
+        <p>Como diagnosticar falhas no simulador:</p>
+        <ul class="list-disc mt-6 space-y-6">
+            <li><strong>Mensagens de Rastreio (<em>Tracing</em>):</strong> Utilização da função <code>printf()</code> para exibir via console/saída serial os valores das variáveis em tempo real.</li>
+            <li><strong>Breakpoints e Janela de Inspeção (<em>Watches</em>):</strong> Pausar o programa em linhas estratégicas para examinar se as <em>flags</em> de estado foram alteradas corretamente.</li>
+            <li><strong>Execução Passo a Passo:</strong> Avançar instrução por instrução para identificar o ponto exato onde a lógica falha.</li>
+        </ul>
+    </div>
+
+    <!-- Slide 18 -->
+    <div class="slide">
+        <h2>4.5 Gestão do Tempo: Atrasos Bloqueantes vs. Não-Bloqueantes</h2>
+        <ul class="list-disc space-y-6">
+            <li><strong>O Problema do <code>delay()</code> Bloqueante:</strong> A função <code>delay()</code> ou <code>sleep()</code> coloca o processador em um estado de espera passiva. Durante essa pausa, o processador fica totalmente "cego": não lê sensores de emergência e consome energia da bateria inutilmente.</li>
+            <li><strong>Abordagem Não-Bloqueante com Temporizadores (<code>&lt;time.h&gt;</code>):</strong> Em vez de mandar a CPU parar, consultamos o relógio do sistema (<code>clock()</code> ou <code>time()</code>). O programa armazena a hora de início e, a cada passagem pelo Super Loop, calcula a diferença de tempo (<code>difftime</code>). Se o intervalo necessário não passou, o processador fica livre para executar outras tarefas com agilidade.</li>
+        </ul>
+    </div>
+
+    <!-- Slide 19 -->
+    <div class="slide">
+        <h2>5. Atividade Prática Integrada: Construção do Firmware</h2>
+        <p>Com base nas ferramentas aprendidas, monte o novo firmware da <strong>Estufa Inteligente</strong> no simulador virtual.</p>
+        <h3 class="mt-8 text-blue-800">Requisitos Técnicos do Projeto</h3>
+        <ol class="list-decimal mt-4">
+            <li><strong>Estado do Hardware (Bitwise):</strong> Declare uma variável de 8 bits do tipo <code>unsigned char status_estufa</code> para gerenciar os dispositivos:
+                <ul class="list-disc ml-8 mt-2 text-gray-700">
+                    <li><strong>Bit 0:</strong> Sensor de Umidade (0: Seco / 1: Úmido).</li>
+                    <li><strong>Bit 1:</strong> Bomba d'Água (0: Desligada / 1: Ligada).</li>
+                    <li><strong>Bit 2:</strong> Alerta de Temperatura (0: OK / 1: Crítico).</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+
+    <!-- Slide 20 -->
+    <div class="slide">
+        <h2>Requisitos Técnicos do Projeto (Cont.)</h2>
+        <ol class="list-decimal" start="2">
+            <li class="mt-6"><strong>Segurança (Cláusula de Guarda):</strong> No início do ciclo, verifique se o bit de "Alerta de Temperatura" está ativo. Se estiver, force imediatamente a transição para o estado de ALERTA e desligue a bomba de água.</li>
+            <li class="mt-6"><strong>Lógica de Controle (Máquina de Estados):</strong> Implemente um <code>switch / case</code> com três estados:
+                <ul class="list-disc ml-8 mt-2 text-gray-700">
+                    <li>MONITORAMENTO: Coleta dados do solo.</li>
+                    <li>IRRIGAÇÃO: Ativa o Bit 1 (Bomba) via operador <code>|</code> se o solo estiver seco (Bit 0 = 0).</li>
+                    <li>ALERTA: Mantém atuadores em modo de segurança e exibe mensagem de emergência.</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+
+    <!-- Slide 21 -->
+    <div class="slide">
+        <h2>Requisitos Técnicos do Projeto (Final)</h2>
+        <ol class="list-decimal" start="4">
+            <li><strong>Super Loop e Tempo Não-Bloqueante:</strong>
+                <ul class="list-disc ml-8 mt-2 text-gray-700">
+                    <li>O sistema deve rodar dentro de uma estrutura <code>while(1)</code>.</li>
+                    <li><strong>É proibido usar <code>delay()</code>.</strong> Utilize a biblioteca <code>&lt;time.h&gt;</code> para imprimir o status do sistema no console <strong>apenas a cada 3 segundos</strong>.</li>
+                </ul>
+            </li>
+            <li class="mt-8"><strong>Sinalização Visual:</strong> Alterne (toggle) o bit de um LED de status a cada ciclo de leitura utilizando o operador XOR (<code>^</code>).</li>
+        </ol>
+    </div>
+
+    <!-- Slide 22 -->
+    <div class="slide">
+        <h2>6. Apresentação das Soluções e Encerramento</h2>
+        <p>Ao término do tempo de desenvolvimento, cada grupo apresentará brevemente sua solução para a turma.</p>
+        <h3 class="mt-8 text-blue-800">Roteiro de Apresentação (5 minutos por grupo):</h3>
+        <ol class="list-decimal mt-4 space-y-4">
+            <li><strong>Demonstração do Simulador:</strong> Exibir o funcionamento da máquina de estados no console e o comportamento do tempo não-bloqueante.</li>
+            <li><strong>Exibição do Código Limpo:</strong> Demonstrar como a Cláusula de Guarda evitou que o sistema irrigasse em estado de superaquecimento.</li>
+            <li><strong>Defesa do Bitwise:</strong> Explicar qual máscara de bit foi utilizada para acionar a bomba de água sem alterar o sensor de umidade.</li>
+            <li><strong>Relato de Bug:</strong> Compartilhar um erro de lógica enfrentado durante o desenvolvimento e como ele foi resolvido usando o <code>printf()</code> ou ferramentas do depurador.</li>
+        </ol>
+    </div>
+
+    <div class="slide-counter" id="counter">1 / 22</div>
+    <div class="progress-bar" id="progress"></div>
+    <div class="controls">
+        <button class="btn" id="btnPrev" onclick="prevSlide()" disabled>Anterior</button>
+        <button class="btn" id="btnNext" onclick="nextSlide()">Próximo</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const progressBar = document.getElementById('progress');
+        const counter = document.getElementById('counter');
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+
+        function updatePresentation() {
+            slides.forEach((slide, index) => {
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+
+            // Atualiza barra de progresso e contador
+            const progressPercentage = ((currentSlide + 1) / slides.length) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+            counter.innerText = `${currentSlide + 1} / ${slides.length}`;
+
+            // Atualiza botões
+            btnPrev.disabled = currentSlide === 0;
+            btnNext.disabled = currentSlide === slides.length - 1;
+        }
+
+        function nextSlide() {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                updatePresentation();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updatePresentation();
+            }
+        }
+
+        // Suporte para teclas de seta do teclado
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
+            }
+        });
+
+        // Inicializa a apresentação
+        updatePresentation();
+    </script>
+</body>
+</html>
