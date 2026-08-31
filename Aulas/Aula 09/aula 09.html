@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aula 09 - Simulação de Sensores Digitais e Analógicos</title>
+<style>
+ body {
+ margin: 0; 
+ padding: 0; 
+ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+ background-color: #f8f9fa; 
+ color: #212529;
+ display: flex; 
+ flex-direction: column; 
+ height: 100vh;
+ overflow: hidden;
+ }
+ .slide-container {
+ width: 95vw;
+ height: 85vh;
+ margin: auto;
+ display: flex; 
+ align-items: center; 
+ justify-content: center;
+ padding: 20px; 
+ box-sizing: border-box; 
+ position: relative;
+ }
+ .slide {
+ display: none; 
+ width: 100%; 
+ max-width: 1200px; 
+ height: 80vh;
+ background: #ffffff; 
+ border-radius: 12px;
+ box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+ padding: 50px;
+ font-size: 24px; 
+ line-height: 1.5; 
+ overflow-y: auto;
+ }
+ .slide.active { 
+ display: block; 
+ animation: fadeIn 0.4s ease-in-out;
+ }
+ @keyframes fadeIn {
+ from { opacity: 0; transform: translateY(10px); }
+ to { opacity: 1; transform: translateY(0); }
+ }
+ h1, h2, h3, h4 { 
+ color: #0d6efd; 
+ margin-top: 0; 
+ }
+ code, pre { 
+ background: #e9ecef; 
+ padding: 10px 15px; 
+ border-radius: 8px; 
+ font-family: 'Courier New', Courier, monospace; 
+ display: block; 
+ font-size: 20px;
+ overflow-x: auto;
+ white-space: pre-wrap;
+ }
+ .controls {
+ height: 80px; 
+ background: #ffffff; 
+ border-top: 1px solid #dee2e6;
+ display: flex; 
+ justify-content: space-between; 
+ align-items: center; 
+ padding: 0 50px;
+ }
+ button {
+ background: #0d6efd; 
+ color: white; 
+ border: none; 
+ padding: 12px 25px;
+ font-size: 18px; 
+ border-radius: 8px; 
+ cursor: pointer;
+ transition: background 0.2s;
+ }
+ button:hover {
+ background: #0b5ed7;
+ }
+ button:disabled { 
+ background: #adb5bd; 
+ cursor: not-allowed; 
+ }
+ .progress { 
+ font-size: 20px; 
+ font-weight: bold; 
+ color: #495057;
+ }
+ .slide-label { font-weight: bold; text-transform: uppercase; color: #6c757d; margin-bottom: 20px; font-size: 18px; letter-spacing: 1px; }
+ .callout { padding: 20px 30px; border-radius: 8px; margin: 20px 0; border-left: 8px solid; }
+ .callout.blue { background: #cce5ff; border-color: #004085; color: #004085; }
+ .callout.green { background: #d4edda; border-color: #155724; color: #155724; }
+ .callout.red { background: #f8d7da; border-color: #721c24; color: #721c24; }
+ .callout.yellow { background: #fff3cd; border-color: #856404; color: #856404; }
+ .section-header { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; }
+ .section-num { font-size: 80px; font-weight: bold; color: #e9ecef; margin-bottom: -20px; }
+ .section-header h2 { font-size: 48px; color: #0d6efd; margin-bottom: 20px; }
+ img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; border: 1px solid #dee2e6; }
+ table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 20px; }
+ th, td { border: 1px solid #dee2e6; padding: 12px; text-align: left; }
+ th { background-color: #e9ecef; color: #0d6efd; }
+</style>
+</head>
+<body>
+ <div class="slide-container" id="slides">
+
+ <div class="slide active">
+ <div class="slide-label">Aula 09</div>
+ <h1>Aula 09 - Simulação de Sensores Digitais e Analógicos</h1>
+ <p><strong>Descrição:</strong> Simulação de leitura de sensores (temperatura, luminosidade, presença) e condicionamento de sinal.</p>
+ </div>
+ 
+ <div class="slide">
+ <h2>Introdução</h2>
+ <p>A aula de hoje é o ponto de partida para a criação de sistemas loT, marcando o início da nossa estação de telemetria.</p>
+ <p>O objetivo é compreender como um microcontrolador interage com o mundo real. Para que um sistema tome decisões, ele primeiro precisa "sentir" o ambiente. Nesta aula, exploraremos como capturar estímulos físicos (luz, calor, movimento e distância) e transformá-los em dados computacionais dentro da linguagem C. A lógica da aula seguirá uma progressão clara: entender o conceito físico, compreender o componente no simulador e, em seguida, aplicar o código em blocos isolados antes do desafio final.</p>
+ </div>
+
+ <div class="slide">
+ <div class="section-header">
+ <div class="section-num">01</div>
+ <h2>Etapa 1: O Universo dos Sensores</h2>
+ </div>
+ </div>
+
+ <div class="slide">
+ <h2>1. O Universo dos Sensores</h2>
+ <p>Para que um sistema de software interaja com o mundo físico, utilizamos sensores, que são transdutores capazes de converter grandezas físicas em sinais elétricos. Na arquitetura do Arduino Uno (ATmega328P), dividimos esses sensores em duas categorias principais de leitura:</p>
+<strong>1. Sensores Digitais:</strong> Trabalham com lógica booleana discreta. O sinal elétrico é interpretado apenas como HIGH (Nível Alto, 5V, ou 1) e LOW (Nível Baixo, OV, ou 0).
+ <div class="callout green">
+Exemplo: Um sensor de presença PIR. Ele responde de forma binária: há movimento (HIGH) ou não há movimento (LOW).
+</div>
+</div>
+
+ <div class="slide">
+ <h2>1. O Universo dos Sensores (Continuação)</h2>
+<strong>2. Sensores Analógicos:</strong> O mundo real não é feito apenas de 0 e 1; ele é contínuo. Sensores analógicos fornecem uma variação contínua de tensão entre OV e 5V. Para que o C entenda isso, o Arduino possui um Conversor Analógico-Digital (ADC) de 10 bits, que "fatia" essa tensão em 1024 degraus. Portanto, uma leitura analógica no pino A0 entregará um número inteiro variando de 0 a 1023.
+<div class="callout green">
+Exemplo: O sensor de temperatura LM35 e o resistor dependente de luz (LDR).
+</div>
+</div>
+
+ <div class="slide">
+ <h2>1. O Universo dos Sensores (Continuação)</h2>
+<strong>3. Sensores Baseados em Tempo de Pulso:</strong> Operam com sinais digitais, mas a informação da grandeza física não está no nível lógico imediato (0 ou 1), e sim no tempo de duração em que um pulso permanece em nível lógico alto.
+<div class="callout green">
+Exemplo: O sensor ultrassônico HC-SR04. Ele emite um pulso de som e aciona um pino digital durante o tempo exato em que a onda sonora viaja até um obstáculo e retorna (eco), permitindo calcular a distância.
+ </div>
+ </div>
+
+ <div class="slide">
+ <h2>Prática 1: Leitura Bruta dos Sensores</h2>
+ <p>Nesta fase, vocês devem acessar o Tinkercad e inserir:</p>
+ <ul>
+ <li>um Arduino Uno,</li>
+ <li>um LDR,</li>
+ <li>um sensor de temperatura LM35 e</li>
+ <li>um sensor PIR.</li>
+ </ul>
+ <div class="callout blue">
+ <strong>Montagem base:</strong> Alimentar os sensores com 5V e GND. Ligar o sinal do PIR no pino digital 2, o sinal do LM35 no A1 e o sinal do LDR no A0.
+ </div>
+ </div>
+
+ <div class="slide">
+ <h2>Bloco de Código 1 - Leitura básica de sensores</h2>
+<pre><code>// Definicao dos pinos
+const int PINO_LDR = A0; // Entrada analogica
+const int PINO_TEMP = A1; // Entrada analogica
+const int PINO_PIR = 2; // Entrada digital
+
+void setup() {
+  Serial.begin(9600); // Inicia a comunicacao serial para inspecao
+  pinMode(PINO_PIR, INPUT); // Configura pino digital como entrada
+}
+
+// Você deve rodar este laço e observar os dados crus no Monitor Serial
+void loop() {
+  int leituraLdrBruta = analogRead(PINO_LDR); // Retorna 0 a 1023
+  int leituraTempBruta = analogRead(PINO_TEMP); // Retorna 0 a 1023
+  int presenca = digitalRead(PINO_PIR); // Retorna 0 ou 1
+
+  Serial.print("LDR Bruto: "); Serial.println(leituraLdrBruta);
+  Serial.print("TEMP Bruto: "); Serial.println(leituraTempBruta);
+  Serial.print("PIR: "); Serial.println(presenca);
+  
+  delay(1000);
+}</code></pre>
+ </div>
+
+ <div class="slide">
+ <h2>Explicação do código</h2>
+ <p>O Bloco de Código 1 tem a função de ler as informações "cruas" dos sensores e exibi-las na tela do computador, dividindo-se em três partes principais:</p>
+ 
+ <h3>1. Definição dos Pinos (Nomeando as conexões):</h3>
+ <p>As primeiras linhas apenas dão nomes aos pinos do Arduino para facilitar o uso no código. Em vez de memorizar que o sensor de luz (LDR) está conectado no pino A0, criamos a constante PINO_LDR para representá-lo.</p>
+ </div>
+ 
+ <div class="slide">
+ <h2>Explicação do código (Continuação)</h2> 
+ <h3>2. Configuração Inicial (setup):</h3>
+ <p>Este bloco roda apenas uma vez quando o Arduino é ligado.</p>
+ <ul>
+ <li>O comando Serial.begin(9600) abre o canal de comunicação entre o Arduino e o computador para que possamos visualizar os dados no Monitor Serial.</li>
+ <li>O comando pinMode(PINO_PIR, INPUT) avisa o microcontrolador que o pino digital 2 servirá como uma porta de entrada (INPUT) para receber a informação do sensor de presença.</li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>Explicação do código (Continuação)</h2>
+ <h3>3. Leitura e Exibição Contínua (loop):</h3>
+ <p>Este bloco trabalha em um ciclo infinito, executando as instruções repetidamente.</p>
+ <ul>
+ <li><strong>Lendo o mundo analógico:</strong> O comando analogRead "fatia" a variação contínua de tensão do sensor de luz e de temperatura, entregando números inteiros brutos que vão de 0 a 1023.</li>
+ <li><strong>Lendo o mundo digital:</strong> O comando digitalRead verifica o sensor de presença, que trabalha de forma binária, entregando apenas os estados 0 (sem movimento) ou 1 (com movimento).</li>
+ <li><strong>Mostrando os dados:</strong> Os comandos Serial.print e Serial.println imprimem esses números recém-capturados na tela.</li>
+ <li><strong>Pausa:</strong> O delay(1000) manda o sistema congelar por 1 segundo (1000 milissegundos) antes de recomeçar a leitura.</li>
+ </ul>
+ </div>
+ 
+ <div class="slide">
+ <div class="callout blue">
+ <strong>Para visualizar os resultados:</strong><br>
+ • Clique no botão "Código" no canto superior direito e, em seguida, clique no botão "Monitor Serial" (ou Serial Monitor) que aparece na parte inferior da tela de código.<br>
+ </div>
+<div class="callout yellow"> 
+ • Inicie a simulação (Iniciar Simulação) para ver os números subindo em tempo real.<br><br>
+ <strong>Atenção:</strong> Você perceberá que o valor do LM35 impresso (ex: 153) não representa a temperatura em graus Celsius. É aqui que entra o próximo conceito.
+ </div>
+ </div>
+
+ <div class="slide">
+ <div class="section-header">
+ <div class="section-num">02</div>
+ <h2>Etapa 2: Condicionadores de Sinal</h2>
+ </div>
+ </div>
+
+ <div class="slide">
+ <h2>2. Condicionadores de Sinal</h2>
+ <p>O dado "bruto" (0 a 1023) gerado pelo ADC não tem utilidade direta para o usuário ou para lógicas avançadas de software. Precisamos de condicionamento de sinal, que pode ser tanto uma adequação no hardware (elétrica) quanto no software (matemática).</p>
+ 
+ <h3>Condicionamento Elétrico (Hardware):</h3>
+ <p>Um LDR altera sua resistência com a luz, mas o Arduino lê tensão (Volts). Para converter a variação de resistência em variação de tensão, utilizamos um circuito chamado Divisor de Tensão, associando o LDR a um resistor (ex: 10 ko) conectado ao GND (resistor pull-down).</p>
+ </div>
+ 
+  <div class="slide">
+   <h2>2. Condicionadores de Sinal (Continuação)</h2>
+ <h3>Condicionamento Matemático (Software):</h3>
+ <ul>
+ <li><strong>Temperatura:</strong> O sensor LM35 gera 10mV para cada grau Celsius. Como o ADC divide 5V em 1024 partes, nossa constante de conversão de unidade ADC para Celsius é calculada pela base (5.0/1023.0) * 100.0, o que nos dá o fator 0.488758.</li>
+ <li><strong>Distância Ultrassônica:</strong> O sensor HC-SR04 emite um pulso sonoro e mede o tempo de retorno em microssegundos com a instrução pulseln(). Para converter esse tempo em centímetros, dividimos a duração por 58.</li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>Prática 2: Implementando Funções de Conversão</h2>
+ <p>Vocês vão apagar o bloco de código anterior e focar apenas na construção lógica das funções em C que transformam dados elétricos em grandezas físicas padronizadas.</p>
+ <div class="callout blue">
+ <strong>Montagem base:</strong> Adicionar o sensor Ultrassônico HC-SR04 ao circuito (Trigger no pino 8, Echo no pino 7).
+ </div>
+ </div>
+
+ <div class="slide">
+ <h2>Bloco de Código 2 - Condicionamento Lógico (Parte 1)</h2>
+<pre><code>// 1. Constantes do Bloco 2
+const int PINO_TRIG = 8;
+const int PINO_ECHO = 7;
+const float BASE_CELSIUS = 0.488758;
+
+// 2. Funcoes do Bloco 2
+float condicionarTemperatura(int leituraBruta) {
+  return (float)leituraBruta * BASE_CELSIUS;
+}
+
+int condicionarLuminosidade(int leituraBruta) {
+  return (int)((leituraBruta / 1023.0) * 100.0);
+}
+
+long lerDistanciaUltrassonica() {
+  digitalWrite(PINO_TRIG, LOW);
+  delayMicroseconds(2);
+  digitalWrite(PINO_TRIG, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(PINO_TRIG, LOW);
+  long duracaoDoPulso = pulseIn(PINO_ECHO, HIGH); // Captura a largura do pulso
+  return duracaoDoPulso / 58;
+}</code></pre>
+ </div>
+
+ <div class="slide">
+ <h2>Bloco de Código 2 - Condicionamento Lógico (Parte 2)</h2>
+<pre><code>// 3. O Motor de Execucao (O que faltava para rodar)
+void setup() {
+  Serial.begin(9600); // Habilita o Monitor Serial
+  pinMode(PINO_TRIG, OUTPUT); // Configura o pino de disparo
+  pinMode(PINO_ECHO, INPUT); // Configura o pino de escuta
+}
+
+void loop() {
+  // Simulando leituras brutas (apenas para validar a conversao matematica)
+  int simulacaoLuzBruta = 512; // Valor ficticio (metade de 1023)
+  int simulacaoTempBruta = 50; // Valor ficticio
+
+  // Chamando as funcoes e armazenando os retornos
+  int luzReal = condicionarLuminosidade(simulacaoLuzBruta);
+  float tempReal = condicionarTemperatura(simulacaoTempBruta);
+  long distanciaReal = lerDistanciaUltrassonica();
+
+  // Imprimindo os resultados no console
+  Serial.print("Luz Simulada: "); Serial.print(luzReal); Serial.println("%");
+  Serial.print("Temp Simulada: "); Serial.print(tempReal); Serial.println(" C");
+  Serial.print("Distancia Real (Sensor): "); Serial.print(distanciaReal); Serial.println(" cm");
+  Serial.println("---");
+  
+  delay(1500); // Pausa para facilitar a visualizacao
+}</code></pre>
+ </div>
+
+ <div class="slide">
+ <h2>Explicação do Código 2</h2>
+ <p>Este bloco de código atua como um "motor de testes" isolado e um "tradutor" de sinais. Ele prova que a matemática das suas funções está correta antes de você conectar todos os componentes físicos. A lógica se divide nas seguintes etapas:</p>
+
+<strong>1. Constantes e O Tradutor (A Lógica):</strong> A variável BASE_CELSIUS armazena o fator exato (0.488758) para o LM35. As funções condicionarTemperatura e condicionarLuminosidade usam a matemática (multiplicação e regra de três) para transformar números elétricos em graus e porcentagem. A função lerDistanciaUltrassonica controla os pulsos do pino TRIG e usa a velocidade do som (dividindo o tempo por 58) para calcular centímetros exatos no pino ECHO.
+</div>
+
+ <div class="slide">
+ <h2>Explicação do Código 2 (Continuação)</h2>
+<strong>2. Preparação do Sistema (setup):</strong> O comando Serial.begin(9600) liga o Monitor Serial. Os comandos pinMode preparam exclusivamente os pinos do sensor ultrassônico (OUTPUT para disparar o som e INPUT para escutar).<br><br>
+<strong>3. Dados Fictícios de Teste (loop):</strong> Como não montamos LDR e LM35 neste teste, o código injeta valores elétricos "inventados" (512 para luz e 50 para temperatura) diretamente nas funções matemáticas, validando o condicionamento independentemente do hardware.
+</div>
+
+ <div class="slide">
+ <h2>Explicação do Código 2 (Continuação)</h2>
+<strong>4. Leitura Ultrassônica Real:</strong> Diferente da luz e temperatura, a distância é testada na prática. A função interage com o sensor HC-SR04 real na tela do simulador.<br><br>
+<strong>5. Exibição e Ritmo:</strong> Os comandos Serial.print organizam e escrevem no console os resultados finais (Luz/Temperatura simuladas e Distância real). O delay(1500) pausa o sistema para facilitar a leitura.
+ </div>
+
+ <div class="slide">
+ <div class="section-header">
+ <div class="section-num">03</div>
+ <h2>Etapa 3: O Desafio do Protagonismo</h2>
+ </div>
+ </div>
+
+ <div class="slide">
+ <h2>3. O Desafio do Protagonismo</h2>
+ <p>Nesta etapa prática você assume o papel de desenvolvedor de sistemas, consolidando os blocos lógicos isolados das etapas anteriores em um único firmware funcional. A transição ocorre da aprendizagem guiada para a resolução autônoma de problemas.</p>
+ </div>
+ 
+  <div class="slide">
+ <h3>1. Dinâmica da Atividade</h3>
+ <ul>
+ <li><strong>Unificação de Código:</strong> Você inicia um sketch em branco no ambiente do Tinkercad. Ele deve declarar globalmente os pinos (PINO_LDR, PINO_TEMP, PINO_PIR, PINO_TRIG, PINO_ECHO) e transcrever as funções de conversão matemática (condicionarTemperatura, condicionarLuminosidade, lerDistanciaUltrassonica) trabalhadas na Etapa 2.</li>
+ <li><strong>Construção do Fluxo Principal:</strong> Utilizando a estrutura básica da linguagem C em microcontroladores, você codifica a função setup() para inicializar a comunicação serial e definir os modos dos pinos (INPUT ou OUTPUT). Em seguida, desenvolve a rotina contínua dentro da função loop().</li>
+ <li><strong>Aplicação de Lógica Condicional:</strong> Utilize as estruturas de controle de decisão (if/else) para analisar os dados condicionados e determinar o estado de segurança do ambiente com base no sensor PIR.</li>
+ </ul>
+ </div>
+
+ <div class="slide">
+ <h2>2. Especificações Técnicas Requeridas</h2>
+ <p>Os valores brutos obtidos por analogRead() e digitalRead() não podem ser impressos diretamente na tela. Eles devem ser armazenados em variáveis locais e, obrigatoriamente, passados como parâmetros para as funções de condicionamento. A avaliação do sensor PIR deve verificar o estado lógico. Se o pino estiver recebendo 5V, a leitura será interpretada como HIGH (movimento), caso contrário, será LOW (repouso). O sistema deve conter um intervalo de tempo (delay()) no final do ciclo principal, estabilizando a taxa de atualização dos dados no Monitor Serial.</p>
+ </div>
+ 
+  <div class="slide">
+ <h3>3. O Entregável</h3>
+ <p>Você deve submeter o link de compartilhamento do projeto funcional no simulador Tinkercad. A entrega é composta por três frentes de avaliação:</p>
+ <ul>
+ <li><strong>Circuito Físico Virtual:</strong> Montagem dos quatro sensores na protoboard, garantindo o barramento de alimentação (5V e GND) correto para o HC-SR04, PIR e LM35, além do divisor de tensão resistivo devidamente conectado ao LDR.</li>
+ <li><strong>Código-Fonte em C Polido:</strong> O código deve apresentar indentação correta, uso de funções modulares para os cálculos e comentários pontuais (utilizando //) para explicar as lógicas de conversão e estruturação de dados.</li>
+ <li><strong>Console de Saída Formatado (Monitor Serial):</strong> O sistema deve processar as grandezas e imprimir uma linha limpa de telemetria a cada ciclo, formatando os dados condicionais exatamente como no exemplo abaixo:</li>
+ </ul>
+ </div>
+ 
+ <div class="slide"> 
+ <div class="callout green">
+ <code>Temp: 25.40 C | Luz: 85% | Dist: 120 cm | Status: Área Segura</code><br>
+ <small>(Saída gerada quando o valor do PIR for LOW)</small><br><br>
+ <code>Temp: 25.40 C | Luz: 85% | Dist: 120 cm | Status: ALERTA: Presença Detectada</code><br>
+ <small>(Saída gerada quando o valor do PIR for HIGH)</small>
+ </div>
+ </div>
+
+ <div class="slide">
+ <h2>Encerramento e Gancho para a próxima aula</h2>
+ <p>Parabéns pela conclusão do núcleo de aquisição de dados! Hoje o nosso sistema ganhou olhos, pele e ouvidos, convertendo grandezas físicas complexas em variáveis numéricas que nosso software em C domina perfeitamente. Vocês perceberam como condicionar os sinais é essencial para obtermos dados confiáveis. Porém, um sistema que apenas "sente" o ambiente é passivo.</p>
+ 
+ <div class="callout blue">
+ <strong>Na Aula 10 - Simulação: Atuadores e Modulação PWM</strong>, daremos vida ao projeto. O código unificado que vocês construíram agora será a base de decisão. Utilizaremos o percentual de luz que acabamos de calcular para movimentar as pás de um servomotor de forma contínua, modulando sua posição. A detecção de presença acionará a comutação de relés de potência para ligar lâmpadas reais, e o limiar de temperatura fará o chaveamento de transistores para controle de velocidade de motores CC via PWM.
+ </div>
+ 
+ <p><strong>O código de leitura da Aula 09 vai disparar a ação mecânica da Aula 10! Guardem bem este código, ele é o cérebro da nossa próxima montagem.</strong></p>
+ </div>
+
+ </div>
+
+ <div class="controls">
+ <button id="prevBtn" onclick="prevSlide()" disabled>Anterior</button>
+ <div class="progress"><span id="current">1</span> / <span id="total"></span></div>
+ <button id="nextBtn" onclick="nextSlide()">Próximo</button>
+ </div>
+
+ <script>
+ let currentSlideIndex = 0;
+ const slides = document.querySelectorAll('.slide');
+ const totalSlides = slides.length;
+ const currentIndicator = document.getElementById('current');
+ const totalIndicator = document.getElementById('total');
+ const prevBtn = document.getElementById('prevBtn');
+ const nextBtn = document.getElementById('nextBtn');
+
+ totalIndicator.textContent = totalSlides;
+
+ function updateView() {
+ slides.forEach((slide, index) => {
+ slide.classList.remove('active');
+ if (index === currentSlideIndex) {
+ slide.classList.add('active');
+ }
+ });
+ currentIndicator.textContent = currentSlideIndex + 1;
+ 
+ prevBtn.disabled = currentSlideIndex === 0;
+ nextBtn.disabled = currentSlideIndex === totalSlides - 1;
+ }
+
+ function nextSlide() {
+ if (currentSlideIndex < totalSlides - 1) {
+ currentSlideIndex++;
+ updateView();
+ }
+ }
+
+ function prevSlide() {
+ if (currentSlideIndex > 0) {
+ currentSlideIndex--;
+ updateView();
+ }
+ }
+
+ document.addEventListener('keydown', (e) => {
+ if (e.key === 'ArrowRight' || e.key === 'PageDown') nextSlide();
+ if (e.key === 'ArrowLeft' || e.key === 'PageUp') prevSlide();
+ });
+ </script>
+</body>
+</html>
