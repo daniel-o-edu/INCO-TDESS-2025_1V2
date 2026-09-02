@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aula 10 - Simulação de Atuadores e Modulação PWM</title>
+    
+    <!-- Estilos CSS -->
+    <style>
+        /* Reset básico e configurações padrão */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f6f8;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Cabeçalho e Navegação */
+        header {
+            background-color: #1e293b;
+            color: #ffffff;
+            padding: 1.2rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .header-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-title h2 {
+            font-size: 1.25rem;
+            margin-bottom: 0.2rem;
+            color: #38bdf8;
+        }
+
+        .header-title span {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+        }
+
+        nav a {
+            color: #e2e8f0;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #38bdf8;
+        }
+
+        /* Conteúdo Principal */
+        main {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            flex: 1;
+            width: 100%;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: #0f172a;
+            margin-bottom: 0.75rem;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            color: #1e293b;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0.4rem;
+        }
+
+        h3 {
+            font-size: 1.15rem;
+            color: #0369a1;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: #475569;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+            color: #475569;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Tabelas estilizadas */
+        .table-responsive {
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.5rem;
+            background-color: #fff;
+            font-size: 0.95rem;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border: 1px solid #e2e8f0;
+        }
+
+        th {
+            background-color: #1e293b;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        /* Blocos de Código e Tags */
+        code {
+            background-color: #f1f5f9;
+            color: #0f172a;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: #0f172a;
+            color: #f8fafc;
+            padding: 1.2rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 1.2rem;
+        }
+
+        pre code {
+            background-color: transparent;
+            color: inherit;
+            padding: 0;
+        }
+
+        /* Caixas de Destaque / Callouts */
+        .callout {
+            background-color: #f0f9ff;
+            border-left: 4px solid #0284c7;
+            padding: 1rem 1.25rem;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+        }
+
+        .callout p:last-child {
+            margin-bottom: 0;
+        }
+
+        .callout-warning {
+            background-color: #fffbeb;
+            border-left-color: #f59e0b;
+        }
+
+        .callout-info {
+            background-color: #f0fdf4;
+            border-left-color: #16a34a;
+        }
+
+        /* Botão estilizado */
+        .btn {
+            display: inline-block;
+            background-color: #0284c7;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #0369a1;
+        }
+
+        /* Rodapé */
+        footer {
+            background-color: #1e293b;
+            color: #94a3b8;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: auto;
+        }
+
+        footer p {
+            color: #94a3b8;
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Cabeçalho -->
+    <header>
+        <div class="header-container">
+            <div class="header-title">
+                <h2>SENAI — Internet das Coisas & Microcontroladores</h2>
+                <span>Situação de Aprendizagem</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#introducao">Introdução</a></li>
+                    <li><a href="#etapa1">Etapa 1</a></li>
+                    <li><a href="#pratica1">Prática 1</a></li>
+                    <li><a href="#etapa2">Etapa 2</a></li>
+                    <li><a href="#pratica2">Prática 2</a></li>
+                    <li><a href="#etapa3">Etapa 3</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main>
+        <!-- Card de Título / Apresentação -->
+        <section class="card">
+            <h1>Aula 10 - Simulação de Atuadores e Modulação PWM</h1>
+            <p><strong>Descrição:</strong> Simulação virtual de controle de cargas, acionamento de relés, transistores, servomotores e saídas PWM.</p>
+        </section>
+
+        <!-- Introdução -->
+        <section id="introducao" class="card">
+            <h2>Introdução</h2>
+            <p>Na Aula 09, o nosso sistema ganhou “olhos, pele e ouvidos”: aprendemos a capturar luz, temperatura, presença e distância e transformar esses estímulos físicos em variáveis numéricas confiáveis dentro do código em C. Mas um sistema que apenas sente o ambiente é passivo — ele observa, mas não age.</p>
+            <p>Esta aula fecha o ciclo fundamental de todo sistema IoT: <strong>sentir &rarr; decidir &rarr; agir</strong>. Hoje vamos dar “músculos” ao projeto, aprendendo a converter os dados condicionados na Aula 09 em movimento e acionamento reais dentro do simulador: um servomotor que se move de acordo com a luminosidade, um relé que liga uma carga quando há presença detectada, e um motor DC cuja velocidade é modulada por PWM de acordo com a temperatura. O código de leitura da Aula 09 será literalmente reaproveitado como o “cérebro” de decisão desta aula.</p>
+        </section>
+
+        <!-- Etapa 1 -->
+        <section id="etapa1" class="card">
+            <h2>Etapa 1 — O Universo dos Atuadores</h2>
+            <p>Se um sensor é um transdutor que converte grandeza física em sinal elétrico, um atuador faz o caminho inverso: converte um sinal elétrico de controle em uma ação física (movimento, força, luz, calor). Na arquitetura do Arduino Uno, trabalharemos com três formas de atuação:</p>
+            
+            <ol>
+                <li>
+                    <strong>Atuadores On/Off via relé:</strong> Um módulo relé funciona como uma chave eletromecânica controlada por um sinal digital (<code>HIGH</code>/<code>LOW</code>) do Arduino. Ele isola eletricamente o circuito de baixa tensão do microcontrolador do circuito de carga (que pode ser de tensão/corrente muito mais altas), por meio de uma bobina que aciona um contato mecânico.
+                </li>
+                <li>
+                    <strong>Atuadores contínuos via PWM — Servomotor:</strong> Controlado pela biblioteca <code>Servo.h</code>, o servo interpreta a largura de um pulso elétrico (tipicamente entre 1 ms e 2 ms) para posicionar seu eixo entre 0° e 180°. O comando <code>servo.write(angulo)</code> abstrai esse cálculo de pulso para o programador.
+                </li>
+                <li>
+                    <strong>Atuadores contínuos via PWM — Motor DC controlado por transistor:</strong> O Arduino não tem corrente suficiente em seus pinos para acionar diretamente um motor. Por isso, usamos um transistor como uma “chave eletrônica”: um pequeno sinal na base (vindo do Arduino, sempre por meio de um resistor limitador) controla uma corrente muito maior entre coletor e emissor, que alimenta o motor.
+                </li>
+            </ol>
+
+            <p><strong>PWM (Pulse Width Modulation)</strong> é a técnica central desta aula: em vez de uma saída puramente <code>HIGH</code> ou <code>LOW</code>, o Arduino simula um valor “analógico” de saída variando a proporção de tempo em nível alto dentro de cada ciclo (o <em>duty cycle</em>). A instrução <code>analogWrite(pino, valor)</code> aceita valores de 0 (0% do tempo em <code>HIGH</code>, desligado) a 255 (100% do tempo em <code>HIGH</code>, potência máxima), e só funciona nos pinos digitais marcados com til (<code>~</code>), no Uno: 3, 5, 6, 9, 10 e 11.</p>
+
+            <div class="callout callout-warning">
+                <p><strong>Atenção — revisão obrigatória da montagem da Aula 09 (resistores)</strong></p>
+                <p>No material da Aula 09, a Etapa 2 explicou corretamente que o LDR precisa de um divisor de tensão com um resistor de 10 k&Omega; para gerar uma leitura confiável no pino A0. Porém essa peça não foi incluída na lista de componentes da Prática 1 nem citada no passo a passo de “Montagem base” — uma omissão que pode ter deixado o resistor de fora do circuito de alguns grupos, mesmo com o código funcionando normalmente no simulador (o valor lido só fica incorreto/instável, o que é fácil de passar despercebido).</p>
+                <p>Antes de iniciar a Aula 10, confira no projeto Tinkercad da Aula 09:</p>
+                <ul>
+                    <li>O LDR está associado a um resistor de 10 k&Omega; formando um divisor de tensão (LDR entre 5V e o pino A0; resistor de 10 k&Omega; entre A0 e GND).</li>
+                    <li>Sem esse resistor, o pino A0 fica “flutuando” eletricamente e os valores de <code>analogRead()</code> deixam de refletir a luminosidade real.</li>
+                </ul>
+                <p>Esse cuidado é ainda mais importante hoje: vamos introduzir um transistor no circuito, e todo pino de controle de um transistor a partir do Arduino também exige um resistor limitador de corrente (resistor de base). As listas de materiais e os passos de montagem desta aula detalham cada resistor necessário — verifiquem item a item antes de simular.</p>
+            </div>
+        </section>
+
+        <!-- Prática 1 -->
+        <section id="pratica1" class="card">
+            <h2>Prática 1 — Montagem e teste isolado dos atuadores</h2>
+            <p>Reabram o mesmo projeto Tinkercad da Aula 09 (<strong>não criem um projeto novo</strong> — vamos reaproveitar o circuito de sensores). Adicionem:</p>
+            <ul>
+                <li>1 Servomotor (Micro Servo)</li>
+                <li>1 Módulo Relé de 1 canal</li>
+                <li>1 Transistor NPN (ex.: 2N2222)</li>
+                <li>1 Motor DC pequeno</li>
+                <li>1 Diodo 1N4007 (proteção contra pico de tensão reversa do motor)</li>
+                <li>1 Resistor de 1 k&Omega; (resistor de base do transistor — obrigatório)</li>
+                <li>Confirmem que o resistor de 10 k&Omega; do LDR (Aula 09) continua presente</li>
+            </ul>
+
+            <h3>Montagem base:</h3>
+            <ul>
+                <li><strong>Servomotor:</strong> fio de sinal (laranja/amarelo) no pino digital 9 (PWM); alimentação no barramento 5V/GND.</li>
+                <li><strong>Módulo relé:</strong> pino IN no pino digital 4; VCC/GND no barramento.</li>
+                <li><strong>Transistor + motor DC:</strong> base do transistor ligada ao pino digital 10 (PWM) através do resistor de 1 k&Omega;; coletor no terminal negativo do motor; emissor no GND; terminal positivo do motor no 5V; diodo 1N4007 em paralelo com o motor, com a faixa (catodo) voltada para o polo positivo, permitindo o retorno seguro da corrente induzida quando o motor é desligado.</li>
+            </ul>
+
+            <h3>Bloco de Código 1 — Movimento bruto dos atuadores</h3>
+<pre><code>#include &lt;Servo.h&gt;
+
+const int PINO_SERVO = 9;      // Saida PWM - servomotor
+const int PINO_RELE = 4;       // Saida digital - rele
+const int PINO_MOTOR_PWM = 10; // Saida PWM - base do transistor (via resistor 1k)
+
+Servo meuServo;
+
+void setup() {
+  Serial.begin(9600);
+  meuServo.attach(PINO_SERVO);
+  pinMode(PINO_RELE, OUTPUT);
+  pinMode(PINO_MOTOR_PWM, OUTPUT);
+}
+
+// Voce deve rodar este laco e observar o movimento dos atuadores no simulador
+void loop() {
+  // Teste do servo: varre de 0 a 180 graus
+  for (int angulo = 0; angulo &lt;= 180; angulo += 30) {
+    meuServo.write(angulo);
+    Serial.print("Servo: "); Serial.println(angulo);
+    delay(500);
+  }
+
+  // Teste do rele: liga e desliga
+  digitalWrite(PINO_RELE, HIGH);
+  Serial.println("Rele: LIGADO");
+  delay(1000);
+  digitalWrite(PINO_RELE, LOW);
+  Serial.println("Rele: DESLIGADO");
+  delay(1000);
+
+  // Teste do motor DC via PWM (rampa de velocidade)
+  for (int pwm = 0; pwm &lt;= 255; pwm += 51) {
+    analogWrite(PINO_MOTOR_PWM, pwm);
+    Serial.print("Motor PWM: "); Serial.println(pwm);
+    delay(500);
+  }
+  analogWrite(PINO_MOTOR_PWM, 0);
+}</code></pre>
+
+            <h3>Explicação do código:</h3>
+            <p>Este código foca no isolamento de hardware para testar individualmente cada componente e garantir que não haja erros de montagem elétrica:</p>
+            <ul>
+                <li><strong>Inclusão de Biblioteca e Mapeamento:</strong> O comando <code>#include &lt;Servo.h&gt;</code> carrega a biblioteca de controle de servomotores. Definem-se constantes para os pinos: pinos PWM 9 e 10 para o servomotor e a base do transistor do motor DC, e o pino digital 4 para a bobina do relé.</li>
+                <li><strong>Configuração no <code>setup()</code>:</strong> Instancia o objeto <code>meuServo</code> e associa seu pino via <code>.attach(9)</code>, o que delega ao temporizador interno do Arduino a geração automática dos pulsos PCM. O Monitor Serial é iniciado a 9600 bps e os pinos do relé e do motor são declarados como saídas com <code>pinMode(..., OUTPUT)</code>.</li>
+                <li><strong>Varredura Angular do Servomotor:</strong> O laço <code>for</code> incrementa o ângulo de 0° a 180° em passos de 30°. O método <code>meuServo.write()</code> converte a variável numérica em pulsos de largura específica (1 ms a 2 ms), reposicionando o eixo mecânico do servo a cada meio segundo.</li>
+                <li><strong>Acionamento Binário do Relé:</strong> Aciona a chave eletromecânica do relé em nível alto (<code>HIGH</code>) e baixo (<code>LOW</code>) com <code>digitalWrite()</code>, permitindo validar visual e audivelmente o chaveamento da carga isolada.</li>
+                <li><strong>Rampa de Velocidade por PWM no Motor DC:</strong> Um laço <code>for</code> eleva o <em>Duty Cycle</em> do pino 10 de 0 a 255 em incrementos de 51 unidades. A instrução <code>analogWrite()</code> altera a proporção de tempo em que o pino permanece em nível alto, variando a corrente na base do transistor e criando uma rampa de aceleração de 5 níveis no motor DC antes de zerar a saída.</li>
+            </ul>
+        </section>
+
+        <!-- Etapa 2 -->
+        <section id="etapa2" class="card">
+            <h2>Etapa 2 — Condicionadores de Atuação: do dado à ação</h2>
+            <p>Assim como na Aula 09 precisamos condicionar o dado bruto do sensor, aqui precisamos condicionar a decisão: transformar um valor já tratado (percentual de luz, graus Celsius, estado do PIR) em um comando de atuação dentro da faixa que cada atuador aceita.</p>
+            <ul>
+                <li><strong><code>map()</code>:</strong> reescala um valor de uma faixa de entrada para uma faixa de saída. Usaremos <code>map(luzPercentual, 0, 100, 0, 180)</code> para converter o percentual de luminosidade (0–100) no ângulo do servo (0–180°).</li>
+                <li><strong><code>constrain()</code>:</strong> garante que um valor nunca ultrapasse os limites seguros de um atuador (por exemplo, manter o PWM sempre entre 0 e 255), mesmo que o cálculo intermediário resulte em um número fora da faixa.</li>
+                <li><strong>Motor DC / PWM por temperatura:</strong> definimos um limiar de segurança (<code>LIMIAR_TEMP</code>); abaixo dele o motor permanece desligado (<code>PWM = 0</code>); acima dele, a velocidade cresce proporcionalmente à temperatura, sempre restrita pelo <code>constrain()</code>.</li>
+                <li><strong>Relé por presença:</strong> lógica binária simples a partir do PIR — <code>HIGH</code> liga, <code>LOW</code> desliga. Atenção: alguns módulos de relé reais são “ativos em <code>LOW</code>” (o relé liga quando o pino recebe 0V); no simulador, verifiquem o comportamento do componente antes de fixar a lógica.</li>
+            </ul>
+        </section>
+
+        <!-- Prática 2 -->
+        <section id="pratica2" class="card">
+            <h2>Prática 2 — Implementando as funções de atuação</h2>
+            <p><strong>Montagem:</strong> a mesma da Prática 1 — sem alterações físicas. Reforcem que o resistor de base do transistor (1 k&Omega;) está de fato entre o pino 10 e a base do componente.</p>
+
+            <h3>Bloco de Código 2 — Condicionamento lógico de atuação</h3>
+<pre><code>#include &lt;Servo.h&gt;
+
+const int PINO_SERVO = 9;
+const int PINO_RELE = 4;
+const int PINO_MOTOR_PWM = 10;
+const float LIMIAR_TEMP = 28.0; // graus Celsius - a partir daqui o motor liga
+
+Servo meuServo;
+
+// Converte o percentual de luz (0-100) em angulo do servo (0-180)
+void moverServoPorLuz(int luzPercentual) {
+  int angulo = map(luzPercentual, 0, 100, 0, 180);
+  meuServo.write(angulo);
+}
+
+// Converte temperatura em duty cycle do motor DC, respeitando o limiar
+void controlarMotorPorTemperatura(float tempCelsius) {
+  int pwm = 0;
+  if (tempCelsius &gt; LIMIAR_TEMP) {
+    pwm = map((int)tempCelsius, (int)LIMIAR_TEMP, 50, 80, 255);
+    pwm = constrain(pwm, 0, 255); // nunca deixa o PWM sair de 0-255
+  }
+  analogWrite(PINO_MOTOR_PWM, pwm);
+}
+
+// Liga ou desliga o rele conforme o estado do PIR
+void controlarRelePorPresenca(int presenca) {
+  digitalWrite(PINO_RELE, presenca == HIGH ? HIGH : LOW);
+}
+
+void setup() {
+  Serial.begin(9600);
+  meuServo.attach(PINO_SERVO);
+  pinMode(PINO_RELE, OUTPUT);
+  pinMode(PINO_MOTOR_PWM, OUTPUT);
+}
+
+void loop() {
+  // Dados ficticios de teste (validando a logica antes de integrar com a Aula 09)
+  int luzSimulada = 70;
+  float tempSimulada = 32.5;
+  int presencaSimulada = HIGH;
+
+  moverServoPorLuz(luzSimulada);
+  controlarMotorPorTemperatura(tempSimulada);
+  controlarRelePorPresenca(presencaSimulada);
+
+  Serial.print("Servo: "); Serial.print(map(luzSimulada, 0, 100, 0, 180)); Serial.println(" graus");
+  Serial.print("Motor: "); Serial.println(tempSimulada &gt; LIMIAR_TEMP ? "ativo" : "desligado");
+  Serial.print("Rele: "); Serial.println(presencaSimulada == HIGH ? "LIGADO" : "DESLIGADO");
+  Serial.println("-------------------------");
+
+  delay(1500);
+}</code></pre>
+
+            <h3>Explicação do código:</h3>
+            <p>Este bloco abstrai os atuadores em funções dedicadas, separando a lógica matemática de conversão das leituras do circuito físico:</p>
+            <ul>
+                <li><strong>Mapeamento Linear do Servo (<code>moverServoPorLuz</code>):</strong> A função recebe a luminosidade tratada em percentual (0 a 100%) e aplica <code>map(luzPercentual, 0, 100, 0, 180)</code>. Essa equação converte proporcionalmente o valor percentual para a escala angular em graus exigida pelo método <code>.write()</code>.</li>
+                <li><strong>Controle Térmico Limiarizado (<code>controlarMotorPorTemperatura</code>):</strong> A função compara a temperatura recebida com a constante <code>LIMIAR_TEMP</code> (28.0 °C). Se o valor for superior, o intervalo de temperatura (entre o limiar e 50 °C) é reescalado via <code>map()</code> para um <em>Duty Cycle</em> de 80 a 255. O uso de <code>constrain(pwm, 0, 255)</code> atua como uma trava de segurança que impede que extrapolações matemáticas gerem valores fora do limite de 8 bits do PWM.</li>
+                <li><strong>Acionamento por Operador Ternário (<code>controlarRelePorPresenca</code>):</strong> Utiliza a estrutura condicional <code>presenca == HIGH ? HIGH : LOW</code> no <code>digitalWrite()</code> para garantir a escrita do estado digital direto do sensor de presença no pino do relé.</li>
+                <li><strong>Validação por Dados Fictícios no <code>loop()</code>:</strong> Antes de integrar os sensores reais, o <code>loop()</code> utiliza variáveis estáticas (<code>luzSimulada = 70</code>, <code>tempSimulada = 32.5</code>, <code>presencaSimulada = HIGH</code>). Essa prática de engenharia de software isola bugs de código da leitura errática de hardware, confirmando o processamento lógico das funções através da impressão organizada no Monitor Serial.</li>
+            </ul>
+
+            <div class="callout callout-info">
+                <p><strong>Checklist de resistores para o circuito final da Aula 10</strong></p>
+                <ul>
+                    <li>Resistor de 10 k&Omega; no divisor de tensão do LDR (revisão da Aula 09 — confirmar antes de simular).</li>
+                    <li>Resistor de 1 k&Omega; na base do transistor que aciona o motor DC (limita a corrente vinda do pino PWM do Arduino; sem ele, o pino ou o transistor podem ser danificados).</li>
+                    <li>Diodo 1N4007 em paralelo com o motor DC, protegendo o transistor contra o pico de tensão reversa (“flyback”) gerado pela bobina do motor ao desligar.</li>
+                    <li>Servomotor e módulo relé são alimentados diretamente pelo barramento 5V/GND, sem resistor adicional — o módulo relé já traz internamente seu próprio transistor, diodo e resistor de acionamento.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Etapa 3 -->
+        <section id="etapa3" class="card">
+            <h2>Etapa 3 — O Desafio do Protagonismo</h2>
+            <p>Chegou o momento de unificar os dois cérebros do projeto: o código de leitura e condicionamento de sinais da Aula 09 e as funções de atuação construídas hoje. O resultado é um único firmware que fecha o ciclo <strong>sentir &rarr; decidir &rarr; agir</strong>.</p>
+
+            <h3>1. Dinâmica da atividade</h3>
+            <ul>
+                <li>Copiem para um novo sketch (ou reaproveitem o mesmo) todas as constantes de pino e as funções <code>condicionarTemperatura</code>, <code>condicionarLuminosidade</code> e <code>lerDistanciaUltrassonica</code> da Aula 09, sem alterações.</li>
+                <li>Adicionem as constantes de pino e as funções <code>moverServoPorLuz</code>, <code>controlarMotorPorTemperatura</code> e <code>controlarRelePorPresenca</code> desta aula.</li>
+                <li>No <code>loop()</code>, leiam e condicionem os sensores (como na Aula 09) e, na sequência, chamem as três funções de atuação passando os valores já condicionados.</li>
+                <li>Utilizem estrutura condicional (<code>if/else</code>) para compor a mensagem de status de segurança a partir do PIR, exatamente como na Aula 09.</li>
+            </ul>
+
+            <h3>2. Especificações técnicas requeridas</h3>
+            <ul>
+                <li>As funções de condicionamento da Aula 09 devem ser reaproveitadas integralmente — não recalculem luminosidade, temperatura ou distância com lógica nova.</li>
+                <li>O uso de <code>map()</code> (conversão de faixas) e <code>constrain()</code> (proteção de limites) é obrigatório nas funções de atuação.</li>
+                <li>O motor DC só pode ser acionado (PWM &gt; 0) quando a temperatura ultrapassar o <code>LIMIAR_TEMP</code> definido; abaixo disso, o PWM deve ser 0.</li>
+                <li>O relé deve refletir o estado do PIR a cada ciclo do <code>loop()</code>, em tempo real.</li>
+                <li>O Monitor Serial deve imprimir, a cada ciclo, uma única linha de telemetria reunindo os dados dos sensores E o estado dos atuadores.</li>
+                <li>Mantenha o <code>delay()</code> de estabilização ao final do <code>loop()</code>.</li>
+            </ul>
+
+            <h3>3. O entregável</h3>
+            <p>Submetam o link de compartilhamento do projeto Tinkercad unificado (sensores da Aula 09 + atuadores da Aula 10). A entrega é composta por três frentes de avaliação:</p>
+            <ul>
+                <li><strong>Circuito físico virtual:</strong> montagem completa dos sensores (Aula 09) e atuadores (Aula 10) na protoboard, com todos os resistores presentes — ver quadro de atenção.</li>
+                <li><strong>Código-fonte em C polido:</strong> indentação correta, funções modulares reaproveitadas e novas, e comentários pontuais explicando a lógica de conversão sensor &rarr; atuador.</li>
+                <li><strong>Console de saída formatado:</strong> linha de telemetria única por ciclo, no padrão do exemplo abaixo:</li>
+            </ul>
+
+<pre><code>Temp: 32.50 C | Luz: 70% | Dist: 45 cm | Servo: 126 graus | Motor PWM: 180 | Rele: LIGADO | Status: ALERTA: Presenca Detectada
+(Saida gerada quando o PIR estiver HIGH e a temperatura acima do limiar)
+
+Temp: 24.10 C | Luz: 40% | Dist: 118 cm | Servo: 72 graus | Motor PWM: 0 | Rele: DESLIGADO | Status: Area Segura
+(Saida gerada quando o PIR estiver LOW e a temperatura abaixo do limiar)</code></pre>
+        </section>
+    </main>
+
+    <!-- Rodapé -->
+    <footer>
+        <p>&copy; SENAI — Serviço Nacional de Aprendizagem Industrial. Todos os direitos reservados.</p>
+    </footer>
+
+    <!-- Scripts JavaScript -->
+    <script>
+        console.log("Página da Aula 10 carregada com sucesso!");
+    </script>
+
+</body>
+</html>
