@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aula 11 - Eletrônica Básica para Arduino</title>
+    
+    <!-- Estilos CSS -->
+    <style>
+        /* Reset básico e configurações padrão */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f6f8;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Cabeçalho e Navegação */
+        header {
+            background-color: #1e293b;
+            color: #ffffff;
+            padding: 1.2rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .header-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-title h2 {
+            font-size: 1.25rem;
+            margin-bottom: 0.2rem;
+            color: #38bdf8;
+        }
+
+        .header-title span {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+        }
+
+        nav a {
+            color: #e2e8f0;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #38bdf8;
+        }
+
+        /* Conteúdo Principal */
+        main {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            flex: 1;
+            width: 100%;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: #0f172a;
+            margin-bottom: 0.75rem;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            color: #1e293b;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0.4rem;
+        }
+
+        h3 {
+            font-size: 1.15rem;
+            color: #0369a1;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: #475569;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+            color: #475569;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Tabelas estilizadas */
+        .table-responsive {
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.5rem;
+            background-color: #fff;
+            font-size: 0.95rem;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border: 1px solid #e2e8f0;
+        }
+
+        th {
+            background-color: #1e293b;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        /* Blocos de Código e Tags */
+        code {
+            background-color: #f1f5f9;
+            color: #0f172a;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: #0f172a;
+            color: #f8fafc;
+            padding: 1.2rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 1.2rem;
+        }
+
+        pre code {
+            background-color: transparent;
+            color: inherit;
+            padding: 0;
+        }
+
+        /* Caixas de Destaque / Callouts */
+        .callout {
+            background-color: #f0f9ff;
+            border-left: 4px solid #0284c7;
+            padding: 1rem 1.25rem;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+        }
+
+        .callout p:last-child {
+            margin-bottom: 0;
+        }
+
+        .callout-warning {
+            background-color: #fffbeb;
+            border-left-color: #f59e0b;
+        }
+
+        .callout-info {
+            background-color: #f0fdf4;
+            border-left-color: #16a34a;
+        }
+
+        /* Botão estilizado */
+        .btn {
+            display: inline-block;
+            background-color: #0284c7;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #0369a1;
+        }
+
+        /* Rodapé */
+        footer {
+            background-color: #1e293b;
+            color: #94a3b8;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: auto;
+        }
+
+        footer p {
+            color: #94a3b8;
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Cabeçalho -->
+    <header>
+        <div class="header-container">
+            <div class="header-title">
+                <h2>SENAI — Eletrônica Básica para Arduino</h2>
+                <span>Situação de Aprendizagem</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#bloco1">Bloco 1</a></li>
+                    <li><a href="#bloco2">Bloco 2</a></li>
+                    <li><a href="#bloco3">Bloco 3</a></li>
+                    <li><a href="#bloco4">Bloco 4</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main>
+        <!-- Card de Título / Apresentação -->
+        <section class="card">
+            <h1>Aula 11 - Eletrônica Básica para Arduino</h1>
+            <p><strong>Descrição:</strong> Apresentação prática dos conceitos de eletrônica analógica e digital aplicados ao ecossistema Arduino. Abrange grandezas elétricas, medição com multímetro, acionamento por transistores, leitura de sensores analógicos e digitais, além de comunicação serial por barramentos.</p>
+        </section>
+
+        <!-- Bloco 1 -->
+        <section id="bloco1" class="card">
+            <h2>Bloco 1: Fundamentos Elétricos, Segurança e Medição</h2>
+            
+            <h3>1. As Grandezas Elétricas: A Analogia da Caixa d'Água</h3>
+            <p>Para entender eletricidade sem ver os elétrons, a analogia do encanamento de água é a ferramenta mais visual possível.</p>
+            <ul>
+                <li><strong>Tensão Elétrica (V):</strong> Imagine duas caixas d'água, uma cheia e outra quase vazia. A Tensão (medida em Volts) é a diferença de altura e a pressão que empurra a água pelo cano. Sem tensão, a água (os elétrons) não se move.</li>
+                <li><strong>Corrente Elétrica (I):</strong> É o fluxo da água passando pelo cano, medido em Ampères. Em microcontroladores, esse fluxo costuma ser um "fio de água" muito fino: um pino digital padrão suporta, com segurança, um máximo de 20 mA de corrente.</li>
+                <li><strong>Resistência Elétrica (R):</strong> É a espessura do cano ou um entupimento no caminho, medida em Ohms (Ω). Quanto mais fino o cano, maior a resistência, e menos água (corrente) consegue passar.</li>
+                <li><strong>Potência (P):</strong> É o trabalho que essa água realiza. Se a água bate em uma roda d'água com força, ela gera trabalho. Na eletrônica, a potência (medida em Watts) indica o quanto de energia está virando luz (em um LED) ou calor (em um resistor).</li>
+            </ul>
+
+            <h3>2. Lei de Ohm: A Matemática do Hardware</h3>
+            <p>A Lei de Ohm é a fórmula que equilibra esse sistema hidráulico. Ela dita que a corrente é diretamente proporcional à tensão e inversamente proporcional à resistência.</p>
+            <p>A Equação: <code>V = R x I</code></p>
+            <p><strong>Aplicação Didática:</strong> Se um microcontrolador libera 5V de "pressão" e um LED só aguenta 2V, sobram 3V. O que fazemos com o excesso? Colocamos um resistor para "absorver" essa diferença. A Lei de Ohm nos diz exatamente qual o tamanho do "cano" (resistor) precisamos usar para limitar o fluxo (corrente) e não estourar o LED.</p>
+
+            <h3>3. Segurança e Aterramento: Os "Firewalls" Físicos</h3>
+            <p>Assim como um software precisa de tratamento de exceções, o hardware precisa de proteções contra comportamentos imprevistos.</p>
+            <ul>
+                <li><strong>O Curto-Circuito:</strong> É o equivalente a uma "divisão por zero" no circuito. Se a resistência cai a zero, a corrente tende ao infinito, gerando calor extremo por efeito Joule que derrete fios e queima trilhas instantaneamente.</li>
+                <li><strong>Proteção com Diodo Flyback:</strong> Quando desligamos motores ou relés, a bobina sofre um colapso magnético e "devolve" um surto de alta tensão invertida (FCEM). O diodo atua como uma válvula de via única, engolindo esse surto e salvando o microcontrolador da destruição.</li>
+                <li><strong>Aterramento (GND):</strong> É o referencial de 0V. Em um projeto com múltiplas fontes de energia, todos os GNDs devem estar conectados. Se os componentes não concordarem sobre o que é o "zero", a comunicação de dados falha por excesso de ruído, como se estivessem falando idiomas diferentes.</li>
+            </ul>
+
+            <h3>4. O Multímetro: O "Debugger" do Mundo Real</h3>
+            <p>O multímetro é a ferramenta que permite inspecionar as variáveis físicas em tempo de execução.</p>
+            <ul>
+                <li><strong>Voltímetro (Mede a Tensão):</strong> Deve ser conectado em paralelo (abraçando o componente). Ele tem uma resistência interna altíssima para apenas "observar" a pressão sem desviar a água.</li>
+                <li><strong>Amperímetro (Mede a Corrente):</strong> Deve ser conectado em série. O circuito precisa ser fisicamente aberto para que o medidor se torne parte do caminho. Se ligado errado (em paralelo), ele cria um curto-circuito perigoso.</li>
+                <li><strong>Ohmímetro (Mede a Resistência):</strong> Só pode ser usado com o circuito totalmente desligado, caso contrário, a energia da placa fritará os circuitos internos do multímetro.</li>
+            </ul>
+        </section>
+
+        <!-- Bloco 2 -->
+        <section id="bloco2" class="card">
+            <h2>Bloco 2: Eletrônica Analógica Aplicada</h2>
+            
+            <h3>1. Diodos e a "Tradução" da Energia (Fontes de Alimentação)</h3>
+            <p>Para que um sistema digital funcione, a energia bruta e alternada (CA) da tomada precisa ser domada e convertida em energia contínua (CC) e estável. Os diodos são os guardiões desse processo.</p>
+            <ul>
+                <li><strong>A Junção PN (O Mecanismo Físico):</strong> Um diodo é formado pela união de dois materiais semicondutores: o Tipo P (positivo, com excesso de lacunas) e o Tipo N (negativo, com excesso de elétrons). Essa união cria uma Barreira de Potencial.</li>
+                <li><strong>A Válvula de Via Única:</strong> O diodo só permite a passagem da corrente em um sentido (do Ânodo para o Cátodo). Se a energia tentar voltar, ele se comporta como um muro (polarização reversa).</li>
+                <li><strong>Diodos Emissores de Luz (LEDs):</strong> Funcionam com a mesma regra da via única, mas emitem fótons ao serem atravessados pela corrente. Para não queimar a junção semicondutora por excesso de calor, é obrigatório calcular o resistor limitador usando a Lei de Ohm: <code>R = (Vs - Vl) / Il</code> (Onde Vs é a fonte, Vl é a tensão do LED e Il a corrente desejada).</li>
+            </ul>
+            <p><strong>Estágios de uma Fonte Linear:</strong> Para chegar aos 5V limpos exigidos por um microcontrolador, a fonte passa por quatro etapas:</p>
+            <ol>
+                <li><strong>Transformação:</strong> Reduz a amplitude (ex: 220V para 12V).</li>
+                <li><strong>Retificação:</strong> Uma ponte de diodos "inverte" a parte negativa da onda, garantindo que o fluxo vá para um lado só (corrente pulsante).</li>
+                <li><strong>Filtragem:</strong> Capacitores atuam como "caixas d'água", enchendo nos picos e esvaziando nas quedas para suavizar o sinal.</li>
+                <li><strong>Regulação:</strong> Circuitos integrados mantêm a tensão rigorosamente cravada no valor necessário, independentemente de oscilações na rede.</li>
+            </ol>
+
+            <h3>2. Transistores Bipolares (BJT): O "If/Else" Físico e as Chaves de Potência</h3>
+            <p>O pino de um microcontrolador não tem força para girar um motor ou acionar uma fechadura elétrica; ele apenas envia um "sinal de inteligência" fraco. O Transistor Bipolar de Junção (BJT) é o músculo que obedece a esse cérebro.</p>
+            <ul>
+                <li><strong>A Analogia da Torneira:</strong> O transistor possui três pernas: Coletor (entrada de água principal), Emissor (saída da água) e Base (o registro da torneira). Aplicar uma pequena corrente na Base permite que uma corrente infinitamente maior passe do Coletor para o Emissor.</li>
+            </ul>
+            <p><strong>Modos de Operação em Sistemas:</strong></p>
+            <ul>
+                <li><strong>Corte:</strong> Quando a saída do pino digital está em LOW (0V), a torneira está totalmente fechada. A carga externa fica desligada.</li>
+                <li><strong>Saturação:</strong> Quando o pino digital envia HIGH (5V), injetamos elétrons suficientes para abrir totalmente a torneira. A corrente flui sem oposição, entregando potência máxima à carga.</li>
+            </ul>
+            <div class="callout callout-info">
+                <p><strong>Nota:</strong> O modo "Ativo" (torneira meio aberta) é usado para amplificar sinais de áudio, mas deve ser evitado no chaveamento digital, pois a resistência parcial gera calor e desperdiça energia.</p>
+            </div>
+            <ul>
+                <li><strong>Topologia (NPN vs. PNP):</strong> O transistor NPN é o mais usado para chaveamento em microcontroladores. Ele é posicionado entre a carga e o GND. Quando recebe sinal positivo na base, ele conduz os elétrons, fechando o circuito em direção ao terra.</li>
+            </ul>
+
+            <h3>3. Amplificadores Operacionais (OpAmps): Decisões Direto no Hardware</h3>
+            <p>Os OpAmps são processadores analógicos. Em vez de rodar código, eles usam propriedades elétricas para resolver problemas instantaneamente.</p>
+            <ul>
+                <li><strong>Modo Comparador (Hardware if/else):</strong> É a função mais útil em módulos de sensores comuns no mercado. O chip possui duas entradas lendo tensões o tempo todo:
+                    <ul>
+                        <li><strong>Entrada de Referência:</strong> Definida por um pequeno parafuso (trimpot) no módulo.</li>
+                        <li><strong>Entrada do Sensor:</strong> Tensão variável vinda, por exemplo, de um sensor de temperatura ou umidade.</li>
+                    </ul>
+                </li>
+            </ul>
+            <p><strong>Como age:</strong> O OpAmp compara as duas tensões em malha aberta. Se o sinal do sensor for maior que a referência, ele "satura" a saída digital para HIGH. Se for menor, ele satura para LOW.</p>
+            <p><strong>Vantagem:</strong> Isso entrega um sinal binário (0 ou 1) pronto para o pino digital da placa ler de forma rápida e limpa, poupando processamento do conversor analógico-digital (ADC) interno.</p>
+
+            <h3>4. Tiristores (TRIACs): O Controle da Rede Alternada</h3>
+            <p>Enquanto transistores dominam o chaveamento de Corrente Contínua (CC), a automação residencial (lâmpadas, chuveiros, eletrodomésticos) funciona em Corrente Alternada (CA). Aqui entram os Tiristores.</p>
+            <ul>
+                <li><strong>O TRIAC:</strong> Equivale eletricamente a dois tiristores SCR conectados em paralelo inverso (antiparalelo) compartilhando o mesmo "gatilho" (Gate).</li>
+                <li><strong>Funcionamento Bidirecional:</strong> Ele consegue conduzir a corrente nos dois sentidos da senóide da rede elétrica (o sobe e desce da CA).</li>
+                <li><strong>Relés de Estado Sólido (SSR):</strong> Muitas vezes, circuitos com TRIACs substituem os relés mecânicos tradicionais. Como não possuem partes móveis nem contatos físicos abrindo e fechando, eles não geram faíscas, operam em silêncio absoluto e possuem uma vida útil infinitamente maior para automatizar cargas elétricas.</li>
+            </ul>
+        </section>
+
+        <!-- Bloco 3 -->
+        <section id="bloco3" class="card">
+            <h2>Bloco 3: Eletrônica Digital, Sensores e Interfaceamento</h2>
+            
+            <h3>1. O Idioma Digital: Níveis Lógicos e Álgebra Booleana</h3>
+            <p>O mundo digital ignora a imprecisão; ele processa e armazena informações exclusivamente através de grandezas discretas (zeros e uns). No hardware, esses estados são representados por faixas de tensão muito bem definidas.</p>
+            <ul>
+                <li><strong>Níveis de Tensão (O true e false físico):</strong> Em um microcontrolador alimentado por 5V, qualquer sinal recebido em um pino digital entre 0,0V e 0,8V é interpretado categoricamente como Nível Lógico Baixo (LOW / 0). Qualquer tensão entre 2,0V e 5,0V é lida como Nível Lógico Alto (HIGH / 1).</li>
+                <li><strong>A Zona de Incerteza:</strong> A faixa intermediária (entre 0,8V e 2,0V) é um "estado proibido". O circuito interno não garante a interpretação, podendo gerar leituras erráticas ou oscilações indesejadas no software.</li>
+                <li><strong>Portas Lógicas (Operadores em Hardware):</strong> As portas lógicas são os blocos construtivos da eletrônica digital, possuindo equivalência direta com a linguagem C/C++:
+                    <ul>
+                        <li><strong>NOT (Inversora):</strong> Inverte o sinal. Equivale ao operador !.</li>
+                        <li><strong>AND:</strong> A saída só é HIGH se todas as entradas forem HIGH. Equivale ao &&.</li>
+                        <li><strong>OR:</strong> A saída é HIGH se pelo menos uma entrada for HIGH. Equivale ao ||.</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>2. A Ponte Entre os Mundos: ADC, DAC e PWM</h3>
+            <p>Microcontroladores "pensam" em digital, mas o mundo real (luz, temperatura, som) é analógico. Precisamos de tradutores entre esses domínios.</p>
+            <ul>
+                <li><strong>Conversor Analógico-Digital (ADC):</strong> É o componente que transcreve grandezas analógicas contínuas em números inteiros discretos.
+                    <ul>
+                        <li>Se o conversor possui resolução de 10 bits, ele divide a tensão de referência (ex: 5V) em 2<sup>10</sup> = 1024 níveis numéricos (de 0 a 1023).</li>
+                        <li>O "degrau" mínimo de leitura (LSB) é calculado por: LSB = 5,0V / 1024 &approx; 0,00488V (4,88 mV).</li>
+                        <li>Isso significa que a cada variação de 4,88 mV no sensor, o valor no software sobe uma unidade.</li>
+                    </ul>
+                </li>
+                <li><strong>Conversor Digital-Analógico (DAC):</strong> Faz o caminho inverso, sintetizando tensões analógicas a partir de números binários, comumente usando redes de resistores como a Escada R-2R.</li>
+                <li><strong>Modulação por Largura de Pulso (PWM):</strong> Como muitos microcontroladores não possuem DACs integrados, eles simulam uma saída analógica "piscando" um pino digital em alta frequência (ex: 490 Hz). Controlamos o Duty Cycle (a porcentagem de tempo que o pulso fica em HIGH). Um pulso em HIGH por 50% do tempo entrega uma tensão média de 2,5V para a carga. No código, isso é configurado com 8 bits (valores de 0 a 255).</li>
+            </ul>
+
+            <h3>3. Sensores e Transdutores: Como o Hardware Sente o Ambiente</h3>
+            <p>Um transdutor converte energia física (como calor ou luz) em energia elétrica, enquanto o sensor entrega esse sinal condicionado para a placa.</p>
+            <p><strong>Sensores Analógicos (Leitura Bruta):</strong></p>
+            <ul>
+                <li><strong>LDR (Fotoresistor):</strong> Sua resistência cai quando exposto à luz (de 1 MΩ no escuro para ~10 kΩ na claridade). Como o microcontrolador não lê resistência diretamente, precisamos conectá-lo a um resistor fixo criando um "Divisor de Tensão", permitindo ler a variação em Volts.</li>
+                <li><strong>LM35 (Temperatura):</strong> Entrega um sinal estritamente linear, onde a cada 1°C a saída sobe 10 mV.</li>
+            </ul>
+            <p><strong>Sensores Digitais (Leitura Processada):</strong></p>
+            <ul>
+                <li><strong>DHT11 (Umidade e Temperatura):</strong> Possui um chip interno que lê os transdutores, processa o dado e envia uma rajada serial pronta de 40 bits (5 bytes) pelo pino de dados, já incluindo um Checksum para que o software valide se houve corrupção no pacote.</li>
+                <li><strong>HC-SR04 (Ultrassônico):</strong> Usa o princípio do "Tempo de Voo" (Time-of-Flight). O software dispara um pulso (Trig), o módulo emite o som, e retorna um pulso (Echo) cujo tempo de duração é proporcional à distância calculada fisicamente.</li>
+            </ul>
+
+            <h3>4. Barramentos e Protocolos: O "Networking" das Placas</h3>
+            <p>Quando a complexidade aumenta, os componentes não usam mais pinos analógicos individuais; eles conversam em rede utilizando protocolos de comunicação.</p>
+            <ul>
+                <li><strong>UART (Comunicação Assíncrona):</strong> Conexão ponto a ponto via pinos TX (Transmissão) e RX (Recepção) cruzados. Como não há pino de sincronismo (Clock), os dois dispositivos precisam ser previamente programados com a mesma velocidade de escuta (ex: 9600 baud rate).</li>
+                <li><strong>I2C (O Barramento "Local"):</strong> Síncrono e ideal para redes curtas. Usa apenas dois fios: SCL (Clock) e SDA (Dados). Trabalha no modelo Mestre-Escravo, onde cada módulo (como displays LCD ou relógios RTC) possui um endereço de hardware fixo (como um IP local de 7 bits), permitindo pendurar dezenas de sensores nos mesmos dois pinos.</li>
+                <li><strong>SPI (Alta Velocidade):</strong> Protocolo síncrono full-duplex (fala e escuta ao mesmo tempo) de 4 fios (MOSI, MISO, SCK, SS). Projetado para transferir blocos pesados de dados em dezenas de MHz, sendo essencial para leitores de cartão SD e matrizes de LED.</li>
+            </ul>
+        </section>
+
+        <!-- Bloco 4 -->
+        <section id="bloco4" class="card">
+            <h2>Bloco 4: Componentes e Dispositivos</h2>
+            
+            <h3>1. Placas de Desenvolvimento e Microcontroladores (Central de Processamento)</h3>
+            <ul>
+                <li><strong>Arduino UNO (ATmega328P):</strong> É a placa de desenvolvimento mais popular para iniciantes e prototipagem geral. É composta por um microcontrolador ATmega328P, circuito de alimentador regulado de 5V, conector USB para gravação/comunicação e 14 pinos digitais de I/O (sendo 6 com suporte a PWM) e 6 entradas analógicas.</li>
+                <li><strong>Arduino MEGA 2560 (ATmega2560):</strong> Placa expandida voltada para projetos de maior complexidade. Possui um microcontrolador ATmega2560, oferecendo 54 pinos de entrada/saída digital, 16 canais analógicos e 4 portas de comunicação serial UART por hardware.</li>
+                <li><strong>Placas Compactas (Arduino Nano e Lilypad):</strong> O Arduino Nano é uma versão em tamanho reduzido própria para montagem em protoboards ou sistemas embarcados definitivos. O Arduino Lilypad possui formato circular e é projetado para eletrônica vestível (wearables) e tecidos inteligentes.</li>
+                <li><strong>Módulos Wi-Fi / ESP8266 (NodeMCU):</strong> Placa microcontrolada de 32 bits que integra conectividade Wi-Fi nativa, permitindo conectar projetos de automação residencial e IoT à internet e plataformas de nuvem.</li>
+            </ul>
+
+            <h3>2. Elementos de Prototipagem e Conectividade (Infraestrutura)</h3>
+            <ul>
+                <li><strong>Protoboard (Matriz de Contatos / Placa de Ensaios):</strong> Placa plástica reutilizável perfurada com tiras condutoras metálicas internas. Permite a montagem experimental de circuitos sem a necessidade de solda elétrica, facilitando testes e ajustes rápidos de componentes.</li>
+                <li><strong>Cabos e Jumpers:</strong> Fios condutores rígidos ou flexíveis dotados de conectores nas extremidades (Macho-Macho, Macho-Fêmea e Fêmea-Fêmea) utilizados para fazer as interconexões elétricas entre a placa Arduino, a protoboard e os sensores/módulos.</li>
+                <li><strong>Registrador de Deslocamento (CI 74HC595):</strong> Circuito integrado expansor de portas. Permite controlar até 8 saídas digitais individuais utilizando apenas 3 pinos digitais do microcontrolador através de comunicação serial-para-paralelo.</li>
+            </ul>
+
+            <h3>3. Componentes Passivos e Semicondutores Discretos</h3>
+            <ul>
+                <li><strong>Resistores Fixos:</strong> Componentes formados por filme de carbono projetados para impor resistência elétrica e limitar a circulação de corrente. São vitais para evitar sobrecarga e queima de LEDs ou portas digitais, além de constituírem redes de divisor de tensão e resistores de pull-up/pull-down para botões e sensores. Seus valores nominais e tolerâncias são identificados por faixas coloridas no corpo do componente.</li>
+                <li><strong>Potenciômetros e Trimpots:</strong> Resistores variáveis ajustáveis manualmente por meio de um eixo giratório ou deslizante. Possuem três terminais e fornecem uma divisão de tensão proporcional ao ângulo de rotação, sendo usados para leitura analógica, ajuste de contraste em telas LCD e controle de intensidade ou velocidade.</li>
+                <li><strong>Capacitores (Cerâmicos e Eletrolíticos):</strong> Componentes dedicados ao armazenamento de energia na forma de um campo elétrico.
+                    <ul>
+                        <li><strong>Capacitores Cerâmicos (ex.: 10 nF e 100 nF):</strong> Não possuem polaridade e atuam na filtragem de ruídos elétricos em altas frequências e no desacoplamento de sinais.</li>
+                        <li><strong>Capacitores Eletrolíticos (ex.: 10 µF e 100 µF):</strong> São construídos com óxido de alumínio e possuem polaridade obrigatória (o terminal positivo mais longo e o negativo indicado por uma faixa no corpo). São empregados na filtragem e estabilização de fontes de alimentação.</li>
+                    </ul>
+                </li>
+                <li><strong>Diodos Retificadores (ex.: 1N4007):</strong> Semicondutores baseados em uma junção PN que admitem o fluxo de corrente em uma única direção (do ânodo para o cátodo). São usados para retificação em fontes de energia e como diodos de roda livre (flyback) para suprimir surtos de força contraeletromotriz gerados por cargas indutivas (como relés e motores).</li>
+                <li><strong>Transistores Bipolares (ex.: BC548 NPN e BC558 PNP):</strong> Dispositivos semicondutores de três terminais (Base, Coletor e Emissor). Operam como chaves eletrônicas acionadas por corrente para chavear cargas de maior potência (como relés, motores e fileiras de LEDs) que excedem os limites das portas do Arduino, ou como amplificadores de sinal.</li>
+            </ul>
+
+            <h3>4. Sensores (Entradas de Dados e Percepção Ambiental)</h3>
+            <ul>
+                <li><strong>Sensor de Luminosidade LDR (Fotoresistor):</strong> Resistor cuja resistência elétrica varia inversamente à luz incidente sobre a sua superfície de Sulfeto de Cádmio (menor resistência sob luz forte e altíssima resistência no escuro). É ligado como divisor de tensão para detectar o nível de iluminação ambiente.</li>
+                <li><strong>Sensor Óptico Reflexivo (TCRT5000 / Seguidor de Linha):</strong> Módulo composto por um LED emissor infravermelho e um fototransistor receptor posicionados lado a lado. Identifica a presença de objetos próximos ou diferenças de reflexão de superfícies (como linhas pretas sobre fundo branco em robôs seguidores de linha).</li>
+                <li><strong>Sensor de Temperatura Analógico (LM35 / NTC):</strong>
+                    <ul>
+                        <li><strong>LM35:</strong> Circuito integrado com saída em tensão strito-linear diretamente calibrada em Celsius (10 mV/°C).</li>
+                        <li><strong>Termistor NTC:</strong> Resistor termossensível de 10 kΩ cuja resistência reduz conforme a temperatura aumenta, exigindo equações de conversão (como Steinhart-Hart) na programação.</li>
+                    </ul>
+                </li>
+                <li><strong>Sensor de Umidade e Temperatura (DHT11 / DHT22):</strong> Módulo digital composto por um elemento capacitivo para umidade e um NTC para temperatura. Envia os dados convertidos através de uma linha digital sob protocolo de comunicação Single-Wire (barramento de 1 fio).</li>
+                <li><strong>Sensor Ultrassônico de Distância (HC-SR04):</strong> Mede distâncias sem contato mecânico emitindo pulsos de som na frequência de 40 kHz pelo pino Trig e calculando o tempo de retorno da onda pelo pino Echo (Time-of-Flight).</li>
+                <li><strong>Sensor de Presença e Movimento PIR (HC-SR501):</strong> Detecta a variação da radiação infravermelha emitida pelo calor de corpos em movimento no seu campo de visão, comutando sua saída digital para nível alto.</li>
+                <li><strong>Módulo Acelerômetro e Giroscópio (MPU-6050 / GY-521):</strong> Módulo MPU-6050 com interface I2C de 3 eixos que mede aceleração linear e velocidade angular para controle de orientação, inclinação e estabilização de sistemas.</li>
+                <li><strong>Sensores de Chuva, Nível de Água e Umidade do Solo:</strong> Placas com trilhas condutoras expostas que alteram sua resistência de saída analógica e digital em resposta à presença de lâminas de água ou à umidade presente no solo.</li>
+            </ul>
+
+            <h3>5. Dispositivos de Interface de Usuário e Controle Manual</h3>
+            <ul>
+                <li><strong>Botões Push-Button (Chaves Tácteis):</strong> Interrupções mecânicas de contato momentâneo que conectam dois pontos do circuito apenas enquanto permanecem pressionados. São usados como entradas digitais em conjunto com resistores de pull-up ou pull-down.</li>
+                <li><strong>Teclado Matricial (Keypad 4x4 ou 3x4):</strong> Conjunto de botões dispostos em uma matriz de linhas e colunas. Permite a leitura de até 16 teclas numéricas e alfanuméricas utilizando apenas 8 pinos do microcontrolador.</li>
+                <li><strong>Módulo Joystick (KY-023):</strong> Controle analógico composto por dois potenciômetros acoplados aos eixos X e Y e um botão central ativado por clique vertical.</li>
+                <li><strong>Encoder Rotativo:</strong> Dispositivo eletromecânico que converte o movimento de rotação do seu eixo em pulsos digitais quadraturas, permitindo medir a velocidade, sentido e posição angular contínua sem limite de fim de curso.</li>
+            </ul>
+
+            <h3>6. Atuadores e Dispositivos de Saída (Ação e Sinalização)</h3>
+            <ul>
+                <li><strong>Diodos Emissores de Luz (LEDs):</strong> Componentes semicondutores que emitem radiação luminosa quando polarizados diretamente (do ânodo para o cátodo). Estão disponíveis nas formas de LEDs mono-cor difusos (vermelho, verde, amarelo, azul), LEDs RGB de 4 pinos (capazes de sintetizar qualquer cor misturando os canais Vermelho, Verde e Azul), e LEDs Infravermelhos transmissores/receptores. Exigem obrigatoriamente um resistor limitador em série.</li>
+                <li><strong>Buzzers (Ativos e Passivos):</strong> Transdutores piezoelétricos para sinalização acústica. Os buzzers ativos possuem oscilador interno e emitem um tom fixo ao receberem 5V; os buzzers passivos exigem frequências geradas pelo microcontrolador (via PWM ou função tone()) para a composição de notas e melodias.</li>
+                <li><strong>Micro Servo Motor (ex.: SG90 9g):</strong> Atuador mecânico integrado contendo motor CC, caixa de redução e circuito de controle com potenciômetro de feedback. Posiciona seu eixo em ângulos precisos de 0° a 180° por meio de sinais de controle PWM de 50 Hz.</li>
+                <li><strong>Motores CC (Corrente Contínua):</strong> Motores elétricos convencionais que convertem energia contínua em rotação contínua. Quando dotados de caixas de redução, fornecem maior torque para tração de robôs e carrinhos.</li>
+                <li><strong>Motor de Passo (28BYJ-48 com Driver ULN2003):</strong> Motor eletromecânico unipolar rotacionado em passos angulares discretos e precisos. É acionado através de um módulo driver baseado no CI ULN2003 (array de transistores Darlington).</li>
+                <li><strong>Módulo Relé (1, 2 ou 4 canais):</strong> Chave eletromecânica acionada por uma bobina de 5V que isola a placa de controle em relação ao circuito de carga. Permite ao Arduino ligar e desligar equipamentos e lâmpadas operando sob tensões alternadas da rede elétrica (127V/220V).</li>
+                <li><strong>Driver de Motor / Ponte H (L298N e L293D):</strong> Circuitos integrados acionadores de potência organizados em topologia de Ponte H. Permitem ao microcontrolador controlar simultaneamente o sentido de rotação e a velocidade (via PWM) de dois motores de corrente contínua independentes sem sobrecarregar a placa.</li>
+            </ul>
+
+            <h3>7. Displays e Dispositivos de Exibição Visual</h3>
+            <ul>
+                <li><strong>Display LCD Alfanumérico (16x2 / HD44780):</strong> Tela de cristal líquido capaz de exibir 16 caracteres por linha em 2 linhas. Pode ser conectado diretamente via barramento paralelo de dados ou por um adaptador de comunicação I2C baseado no chip PCF8574, reduzindo a fiação ocupada para apenas 2 pinos (SDA e SCL).</li>
+                <li><strong>Display de 7 Segmentos (1 ou 4 dígitos):</strong> Arranjo de LEDs dispostos em forma de "8" para exibição de algarismos numéricos e letras limitadas. Estão disponíveis nas configurações de Cátodo Comum (todos os catodos interligados no GND) ou Ânodo Comum (todos os anodos interligados no VCC).</li>
+                <li><strong>Matriz de LEDs (8x8):</strong> Grade contendo 64 LEDs dispostos em 8 linhas e 8 colunas para exibição de caracteres, ícones e gráficos simples. Podem ser controladas por integrados dedicados (como o MAX7219 ou controladores I2C) para simplificar a fiação.</li>
+            </ul>
+
+            <h3>8. Módulos de Comunicação, Identificação e Tempo Real</h3>
+            <ul>
+                <li><strong>Módulo RTC (Real Time Clock - DS1302 / DS1307 / DS3231):</strong> Relógio em tempo real equipado com um cristal de quartzo de 32,768 kHz e bateria de lítio tipo moeda (CR2032). Mantém a contagem precisa de segundos, minutos, horas, dias e anos mesmo quando o circuito principal é desligado.</li>
+                <li><strong>Módulos de Comunicação Sem Fio (RF 433 MHz e Bluetooth HC-05/HC-06):</strong>
+                    <ul>
+                        <li><strong>Módulos RF 433 MHz (FS1000A / XY-MK-5V):</strong> Par transmissor/receptor unidirecional que opera na frequência de 433,92 MHz por modulação ASK para envio de dados à distância.</li>
+                        <li><strong>Módulo Bluetooth (HC-05 / HC-06):</strong> Interface de comunicação sem fio bidirecional serial (UART) que permite parear o Arduino a smartphones e computadores.</li>
+                    </ul>
+                </li>
+                <li><strong>Kit de Controle Remoto e Receptor Infravermelho (IR):</strong> Módulo receptor de IV (ex.: VS1838B / KY-022) e controle remoto transmissor de mão. Permite enviar comandos e códigos de teclas codificados (protocolo NEC) pelo ar para acionamento de sistemas.</li>
+                <li><strong>Módulo Leitor RFID (RC522 - 13,56 MHz):</strong> Módulo de identificação por radiofrequência baseado na interface SPI. Lê e grava dados em cartões de proximidade e chaveiros (tags Mifare) para controle de acesso.</li>
+            </ul>
+        </section>
+    </main>
+
+    <!-- Rodapé -->
+    <footer>
+        <p>&copy; SENAI — Serviço Nacional de Aprendizagem Industrial. Todos os direitos reservados.</p>
+    </footer>
+
+    <!-- Scripts JavaScript -->
+    <script>
+        console.log("Página da Aula 11 carregada com sucesso!");
+    </script>
+
+</body>
+</html>
