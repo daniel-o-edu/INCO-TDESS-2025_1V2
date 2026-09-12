@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aula 12 - Programação de Sistemas Embarcados</title>
+    
+    <!-- Estilos CSS -->
+    <style>
+        /* Reset básico e configurações padrão */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f6f8;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Cabeçalho e Navegação */
+        header {
+            background-color: #1e293b;
+            color: #ffffff;
+            padding: 1.2rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .header-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-title h2 {
+            font-size: 1.25rem;
+            margin-bottom: 0.2rem;
+            color: #38bdf8;
+        }
+
+        .header-title span {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+        }
+
+        nav a {
+            color: #e2e8f0;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #38bdf8;
+        }
+
+        /* Conteúdo Principal */
+        main {
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            flex: 1;
+            width: 100%;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: #0f172a;
+            margin-bottom: 0.75rem;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            color: #1e293b;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0.4rem;
+        }
+
+        h3 {
+            font-size: 1.15rem;
+            color: #0369a1;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: #475569;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+            color: #475569;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Tabelas estilizadas */
+        .table-responsive {
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.5rem;
+            background-color: #fff;
+            font-size: 0.95rem;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border: 1px solid #e2e8f0;
+        }
+
+        th {
+            background-color: #1e293b;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        /* Blocos de Código e Tags */
+        code {
+            background-color: #f1f5f9;
+            color: #0f172a;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: #0f172a;
+            color: #f8fafc;
+            padding: 1.2rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 1.2rem;
+        }
+
+        pre code {
+            background-color: transparent;
+            color: inherit;
+            padding: 0;
+        }
+
+        /* Caixas de Destaque / Callouts */
+        .callout {
+            background-color: #f0f9ff;
+            border-left: 4px solid #0284c7;
+            padding: 1rem 1.25rem;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+        }
+
+        .callout p:last-child {
+            margin-bottom: 0;
+        }
+
+        .callout-warning {
+            background-color: #fffbeb;
+            border-left-color: #f59e0b;
+        }
+
+        .callout-info {
+            background-color: #f0fdf4;
+            border-left-color: #16a34a;
+        }
+
+        /* Botão estilizado */
+        .btn {
+            display: inline-block;
+            background-color: #0284c7;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #0369a1;
+        }
+
+        /* Rodapé */
+        footer {
+            background-color: #1e293b;
+            color: #94a3b8;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: auto;
+        }
+
+        footer p {
+            color: #94a3b8;
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Cabeçalho -->
+    <header>
+        <div class="header-container">
+            <div class="header-title">
+                <h2>SENAI — Programação de Sistemas Embarcados</h2>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#bloco1">Nível 1</a></li>
+                    <li><a href="#bloco2">Nível 2</a></li>
+                    <li><a href="#bloco3">Nível 3</a></li>
+                    <li><a href="#bloco4">Nível 3 Avançado</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main>
+        <!-- Card de Título / Apresentação -->
+        <section class="card">
+            <h1>Aula 12 - Programação de Sistemas Embarcados</h1>
+            <p><strong>Descrição:</strong> Programação de microcontroladores de forma progressiva, partindo da sintaxe básica e gestão de memória até técnicas avançadas, como multitarefa e otimização de hardware. O objetivo é desenvolver o raciocínio lógico-computacional, conectando a teoria diretamente à resolução de desafios reais.</p>
+        </section>
+
+        <!-- Bloco 1 -->
+        <section id="bloco1" class="card">
+            <h2>Nível 1 - Fundamentos do Microcontrolador, Sintaxe e E/S Digital</h2>
+            
+            <h3>Tópico 1.1: Estrutura Básica de um Sketch (setup() e loop())</h3>
+            <p><strong>Conceito Detalhado:</strong> O microcontrolador (como o ATmega328P do Arduino UNO) atua como um cérebro eletrônico de alta velocidade, porém sem iniciativa própria, exigindo instruções estruturadas passo a passo. O código escrito na IDE do Arduino é chamado de Sketch (salvo com a extensão .ino). Ele é processado por um compilador (como o avr-gcc), transformado em binário e gravado na memória Flash.</p>
+            <p><strong>Ciclo de Vida do Programa:</strong> A linguagem exige duas funções obrigatórias:</p>
+            <ul>
+                <li><strong>setup():</strong> Executada uma única vez assim que a placa é energizada ou resetada. É voltada para as configurações iniciais de hardware (como definir modos de pinos e inicializar barramentos de comunicação).</li>
+                <li><strong>loop():</strong> Laço infinito principal que roda continuamente enquanto o circuito receber energia. Ao atingir a última instrução, o processador retorna imediatamente à primeira linha da função.</li>
+            </ul>
+            <p><strong>Regras Sintáticas:</strong> Instruções individuais devem terminar obrigatoriamente com ponto e vírgula (;). Blocos de código são delimitados por chaves {}. A linguagem é sensível a maiúsculas e minúsculas (case-sensitive). Comentários de linha única usam // e de múltiplas linhas usam /* */.</p>
+<pre><code>// Função de configuração: executa apenas uma vez
+void setup() {
+  // Configurações de hardware entram aqui
+}
+
+// Função de execução contínua: laço infinito
+void loop() {
+  // Código executado repetidamente
+}</code></pre>
+
+            <h3>Tópico 1.2: Variáveis, Constantes e Tipos de Dados Primitivos</h3>
+            <p><strong>Conceito Detalhado:</strong> O Arduino UNO possui apenas 2 KB de memória SRAM. Para efeito de comparação, um smartphone comum possui 4 milhões de vezes mais memória. Por isso, a escolha do tipo de dado correto é uma questão estratégica de sobrevivência para o sistema. Uma variável é um local nomeado na memória SRAM reservado para armazenar dados temporários.</p>
+            <p><strong>Regras de Identificadores:</strong> Nomes de variáveis não podem começar com números, não aceitam espaços nem caracteres especiais (exceto o sublinhado) e seguem a convenção camelCase.</p>
+            
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tipo de Dado</th>
+                            <th>Tamanho</th>
+                            <th>Faixa de Valores / Uso</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>void</td>
+                            <td>-</td>
+                            <td>Tipo indefinido ou sem retorno de valor.</td>
+                        </tr>
+                        <tr>
+                            <td>boolean / bool</td>
+                            <td>1 byte</td>
+                            <td>Armazena estritamente true (1) ou false (0).</td>
+                        </tr>
+                        <tr>
+                            <td>char / byte</td>
+                            <td>1 byte</td>
+                            <td>char: caracteres ASCII. byte: Inteiro sem sinal (0 a 255).</td>
+                        </tr>
+                        <tr>
+                            <td>int / unsigned int</td>
+                            <td>2 bytes</td>
+                            <td>-32.768 a +32.767 (int padrão) / 0 a 65.535 (unsigned).</td>
+                        </tr>
+                        <tr>
+                            <td>long / float</td>
+                            <td>4 bytes</td>
+                            <td>Essencial para grandes contagens ou precisão decimal.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="callout callout-warning">
+                <p><strong>Estouro de Memória (Overflow):</strong> Se somarmos 1 a uma variável de tipo byte com valor 255, ela estoura seu limite e retorna a 0.</p>
+            </div>
+            
+            <p><strong>Constantes e Escopo:</strong> Constantes imutáveis são criadas com const ou via diretiva #define. Variáveis globais são declaradas fora de funções e persistem por todo o programa; variáveis locais são criadas dentro de funções e destruídas ao final da execução do bloco.</p>
+<pre><code>const float PI_CIRCUITO = 3.14159; // Constante em memória
+int contadorLeituras = 0;          // Variável global de 2 bytes
+
+void setup() {
+  byte pinoSensor = 7;             // Variável local de 1 byte
+}
+
+void loop() {}</code></pre>
+
+            <h3>Tópico 1.3: Operadores Aritméticos, Relacionais e Lógicos</h3>
+            <p><strong>Conceito Detalhado:</strong> Operadores são ferramentas de processamento do microcontrolador para transformar dados. A divisão entre inteiros descarta decimais. O compilador aplica a Avaliação por Curto-Circuito: se a primeira condição de um operador lógico E (&&) for falsa, a segunda nem é processada.</p>
+            <ul>
+                <li><strong>Aritméticos:</strong> +, -, *, /, % (módulo). Incremento (++) e atribuições compostas (+=, etc).</li>
+                <li><strong>Relacionais:</strong> == (igual a), != (diferente de), &lt;, &gt;, &lt;=, &gt;=. Retornam estritamente true (1) ou false (0).</li>
+                <li><strong>Lógicos:</strong> && (E lógico), || (OU lógico), ! (NÃO).</li>
+            </ul>
+            <div class="callout callout-warning">
+                <p><strong>Atenção:</strong> Usar = no lugar de == dentro de um teste condicional força o resultado a ser verdadeiro. Erro comum!</p>
+            </div>
+<pre><code>int a = 10;
+int b = 3;
+
+void setup() {
+  int resto = a % b;                // Resto da divisão: 1
+  bool status = (a > 5) && (b < 5); // Avalia como true (1)
+}
+
+void loop() {}</code></pre>
+
+            <h3>Tópico 1.4: Funções de E/S Digital e Comunicação Serial (UART)</h3>
+            <p><strong>Conceito Detalhado:</strong> Pinos digitais operam exclusivamente em HIGH (5V) ou LOW (0V). A função pinMode() define OUTPUT ou INPUT.</p>
+            
+            <div class="callout callout-info">
+                <p><strong>Integração Prática de Circuitos:</strong></p>
+                <p>O modo INPUT_PULLUP é fundamental: ele ativa resistores internos (20 a 50 kΩ), eliminando o estado "flutuante" de ruídos eletromagnéticos sem exigir resistores externos na protoboard. Uma excelente prática de economia de hardware.</p>
+                <p>A comunicação UART permite troca com o PC via RX/TX. Inicia com Serial.begin(9600) e usa Serial.available() e Serial.read() para manipular o buffer de 128 bytes.</p>
+            </div>
+
+<pre><code>void setup() {
+  pinMode(13, OUTPUT);
+  pinMode(2, INPUT_PULLUP); // Botão com resistor interno ativado
+  Serial.begin(9600);
+}
+
+void loop() {
+  int estadoBotao = digitalRead(2); // Lê o botão (LOW se pressionado)
+  digitalWrite(13, !estadoBotao);   // Acende o LED ao pressionar
+  Serial.println(estadoBotao);
+  delay(100);
+}</code></pre>
+        </section>
+
+        <!-- Bloco 2 -->
+        <section id="bloco2" class="card">
+            <h2>Nível 2 - Estruturas de Controle, Sinais Analógicos e Vetores</h2>
+            
+            <h3>Tópico 2.1: Estruturas de Controle Condicional</h3>
+            <p><strong>Conceito Detalhado:</strong> Desviam o fluxo do programa para decisões autônomas. Incluem blocos if, else if e else.</p>
+            <p><strong>Estrutura switch...case (Aplicação em Projetos):</strong> Ideal para menus de interfaces seriais em sistemas robóticos. Funciona comparando inteiros ou chars. Lembre-se do Fall-Through: se omitir o break, executa todos em cascata.</p>
+<pre><code>char comando = 'A';
+
+void setup() {
+  Serial.begin(9600);
+  switch (comando) {
+    case 'A':
+      Serial.println("Motor Ligado");
+      break; // Impede cascata
+    case 'B':
+      Serial.println("Motor Desligado");
+      break;
+    default:
+      Serial.println("Comando Invalido");
+      break;
+  }
+}
+
+void loop() {}</code></pre>
+
+            <h3>Tópico 2.2: Laços de Repetição</h3>
+            <p><strong>Conceito Detalhado:</strong> Automatizam repetições.</p>
+            <ul>
+                <li><strong>for:</strong> Iterações conhecidas. for (inicialização; condição; incremento).</li>
+                <li><strong>while:</strong> Avalia no início. Cuidado com laços infinitos travando a placa.</li>
+                <li><strong>do...while:</strong> Avalia no final. Garante execução mínima de 1x (ideal para rotinas de calibração de sensores).</li>
+            </ul>
+
+            <h3>Tópico 2.3: Conversão Analógica, PWM e Funções Matemáticas</h3>
+            <p><strong>Conceito Detalhado:</strong> O mundo real é analógico; microcontroladores são digitais.</p>
+            <ul>
+                <li><strong>Entrada ADC:</strong> Conversor de 10 bits. Lê de 0V a 5V mapeando para 0 a 1023. analogRead().</li>
+                <li><strong>Saída PWM:</strong> Gera onda quadrada para simular tensão. Escala 8 bits (0 a 255). analogWrite().</li>
+            </ul>
+            <p>A função map() é vital para converter proporcionalmente a leitura do sensor (10 bits) para a saída do atuador (8 bits).</p>
+<pre><code>void setup() { 
+  pinMode(9, OUTPUT); 
+}
+
+void loop() {
+  int valorLeitura = analogRead(A0);
+  int valorPWM = map(valorLeitura, 0, 1023, 0, 255);
+  analogWrite(9, valorPWM);
+}</code></pre>
+
+            <h3>Tópico 2.4: Coleções de Dados e Texto</h3>
+            <p><strong>Conceito Detalhado:</strong> Vetores (arrays) agrupam grandes dados. O índice começa em 0. Cuidado com a invasão de memória ao acessar índices inexistentes.</p>
+            <p>Para texto, evite a Classe String que fragmenta a RAM de 2KB. Prefira C-Strings (vetores de char terminados em \0).</p>
+        </section>
+
+        <!-- Bloco 3 -->
+        <section id="bloco3" class="card">
+            <h2>Nível 3 - Modularização, Temporização Não-Bloqueante e Ponteiros</h2>
+            
+            <h3>Tópico 3.1: Modularização e Modificador static</h3>
+            <p><strong>Conceito Detalhado:</strong> Dividir código em funções (com parâmetros e retornos). O modificador static preserva o valor da variável local entre sucessivas execuções, evitando o excesso de variáveis globais.</p>
+
+            <h3>Tópico 3.2: Temporização Não-Bloqueante (Multitarefa Cooperativa)</h3>
+            <div class="callout callout-info">
+                <p><strong>Aplicação em Projetos de Robótica:</strong> A função delay() congela todo o processador. Em robótica, isso é inaceitável (um robô não pode ignorar um sensor de obstáculo enquanto pisca um LED).</p>
+                <p>Ao usar millis() (que retorna o tempo desde a energização em ms, durando ~49 dias até o overflow), capturamos "carimbos de tempo". Isso permite executar tarefas paralelas assíncronas.</p>
+            </div>
+<pre><code>unsigned long tempoAnterior = 0;
+const long intervalo = 1000;
+bool estadoLED = LOW;
+
+void setup() { 
+  pinMode(13, OUTPUT); 
+}
+
+void loop() {
+  unsigned long tempoAtual = millis();
+  
+  if (tempoAtual - tempoAnterior >= intervalo) {
+    tempoAnterior = tempoAtual;
+    estadoLED = !estadoLED;
+    digitalWrite(13, estadoLED);
+  }
+  // CPU totalmente livre para ler sensores ultrassônicos simultaneamente!
+}</code></pre>
+
+            <h3>Tópico 3.3: Ponteiros e Estruturas (struct)</h3>
+            <p><strong>Conceito Detalhado:</strong> Ponteiros armazenam o endereço físico SRAM de outra variável. Consomem 2 bytes. O operador &amp; captura o endereço, e o * acessa o conteúdo.</p>
+            <p><strong>Estruturação Profissional:</strong> Utilizando structs, o programador pode agrupar dados heterogêneos sob um identificador. Extremamente útil para organizar as múltiplas leituras de sensores complexos de um sistema em um pacote só.</p>
+<pre><code>struct SensorData {
+  int id;
+  float temperatura;
+};
+
+void zerarSensor(SensorData *s) {
+  s->temperatura = 0.0; // Uso de seta para acessar membro via ponteiro
+}
+
+void setup() {
+  Serial.begin(9600);
+  SensorData s1 = {1, 25.5};
+  zerarSensor(&s1); // Passagem por referência
+}
+
+void loop() {}</code></pre>
+        </section>
+
+        <!-- Bloco 4 -->
+        <section id="bloco4" class="card">
+            <h2>Nível 3 Avançado - Pílulas de Conhecimento Sob Demanda</h2>
+            
+            <h3>Tópico 3.4: Manipulação de Bits (Bitwise) e Registradores de Deslocamento</h3>
+            <p><strong>Conceito Detalhado:</strong> Permite manipular individualmente os bits de dados em registradores de hardware com velocidade e eficiência máxima de processamento.</p>
+            <p><strong>Operadores Bit a Bit:</strong></p>
+            <ul>
+                <li><strong>&amp; (AND Bitwise):</strong> Retorna 1 apenas se ambos os bits forem 1.</li>
+                <li><strong>| (OR Bitwise):</strong> Retorna 1 se ao menos um dos bits for 1.</li>
+                <li><strong>^ (XOR Bitwise):</strong> Retorna 1 se os bits forem diferentes.</li>
+                <li><strong>~ (NOT Bitwise):</strong> Inverte todos os bits de uma variável.</li>
+                <li><strong>&lt;&lt; (Deslocamento à Esquerda):</strong> Desloca bits para a esquerda, multiplicando por potências de 2.</li>
+                <li><strong>&gt;&gt; (Deslocamento à Direita):</strong> Desloca bits para a direita, dividindo por potências de 2.</li>
+            </ul>
+            <p><strong>Máscaras de Bits e Funções Nativas:</strong> Máscaras combinam operadores para ligar (reg |= (1&lt;&lt;bit)), desligar (reg &amp;= ~(1&lt;&lt;bit)) e testar bits. O Arduino abstrai essas ações pelas funções nativas bitSet(), bitClear(), bitRead() e bitWrite().</p>
+            <p><strong>Expansão de Saídas:</strong> Permite controlar múltiplos pinos externos usando poucos pinos do microcontrolador por meio de CI registradores de deslocamento (como o 74HC595) usando a função shiftOut(pinoDados, pinoClock, ordemBits, valor).</p>
+<pre><code>byte registradores = 0b00000000; // Byte inicial zerado
+
+void setup() {
+  Serial.begin(9600);
+  bitSet(registradores, 3); // Liga o bit na posição 3 -> 0b00001000
+  Serial.println(registradores); // Exibe o valor numérico 8
+  bitClear(registradores, 3); // Desliga o bit na posição 3 -> 0b00000000
+}
+
+void loop() {}</code></pre>
+
+            <h3>Tópico 3.5: Uso de Bibliotecas Externas e Gerenciamento de Memória (EEPROM e PROGMEM)</h3>
+            <p><strong>Inclusão de Bibliotecas:</strong> A diretiva #include &lt;biblioteca.h&gt; incorpora códigos prontos que abstraem periféricos complexos. Arquivos .h (header) declaram funções e classes; arquivos .cpp contêm as implementações.</p>
+            <p><strong>Memória EEPROM Interna:</strong> Memória não-volátil onde os dados persistem mesmo após desligar a placa da tomada. O ATmega328P do Arduino UNO possui 1 KB (1024 bytes) de EEPROM. Utiliza a biblioteca &lt;EEPROM.h&gt; e as funções EEPROM.read(endereço) e EEPROM.write(endereço, valor).</p>
+            <p><strong>Memória Flash (PROGMEM):</strong> A memória RAM do Arduino UNO é escassa (2 KB), enquanto a memória Flash possui 32 KB. Grandes tabelas estáticas, constantes fixas ou matrizes de fontes e texto causam o rápido esgotamento da RAM. Utilizando a palavra-chave PROGMEM da biblioteca &lt;avr/pgmspace.h&gt;, forçamos o armazenamento dessas tabelas estáticas diretamente na Flash, liberando a RAM. Os dados são lidos na execução através da função pgm_read_byte().</p>
+<pre><code>#include &lt;EEPROM.h&gt; // Biblioteca para EEPROM
+#include &lt;avr/pgmspace.h&gt; // Biblioteca para PROGMEM
+
+// Armazena vetor diretamente na memória Flash para economizar RAM
+const byte tabelaMensagens[] PROGMEM = {10, 20, 30, 40, 50};
+
+void setup() {
+  Serial.begin(9600);
+  EEPROM.write(0, 150); // Grava o valor 150 no endereço 0 da EEPROM
+  int valorSalvo = EEPROM.read(0); // Lê o dado mantido sem energia
+  
+  // Lê o primeiro elemento da tabela gravada na memória Flash
+  byte dadoFlash = pgm_read_byte(&(tabelaMensagens[0]));
+}
+
+void loop() {}</code></pre>
+
+            <h3>Tópico 3.6: Interrupções de Hardware (ISR)</h3>
+            <p><strong>Conceito Detalhado:</strong> Eventos urgentes que pausam a rotina normal instantaneamente (Pinos D2 e D3 do UNO) usando attachInterrupt(). Acionados por LOW, CHANGE, RISING ou FALLING.</p>
+            <p><strong>Regras Rígidas para ISR:</strong></p>
+            <ul>
+                <li>As funções ISR devem ser ultrarrápidas.</li>
+                <li>Não usar comunicações seriais.</li>
+                <li>Proibido usar millis() ou delay(). (Prática Recomendada: Adicione intencionalmente um delay() em uma ISR e observe o hardware travar de forma didática).</li>
+                <li>Variáveis modificadas dentro da ISR devem possuir o modificador volatile.</li>
+            </ul>
+
+            <h3>Tópico 3.7: Uso de Macros com Pré-Processamento</h3>
+            <p><strong>O Papel do Pré-processador:</strong> O pré-processador da linguagem C atua antes da compilação real. Ele realiza substituição textual pura e simples. As diretivas iniciam com o caractere # (ex.: #define, #include, #ifdef).</p>
+            <p><strong>Conceito Detalhado:</strong> O pré-processamento é a primeira etapa do processo de compilação. Nesta fase, o código-fonte é lido e modificado com base em diretivas, incluindo a remoção de comentários e a execução de trocas textuais antes da geração do código assembly ou binário.</p>
+            <ul>
+                <li><strong>#define (Expansão de Macros):</strong> Permite definir um identificador que será substituído por um texto ou valor antes da compilação. Um erro comum é achar que o #define cria variáveis na memória; na verdade, atua como uma substituição textual e não cria "constantes" alocadas na SRAM do microcontrolador. Isso permite economizar memória.</li>
+                <li><strong>#include (Inclusão de Arquivos):</strong> Utilizada para incorporar o conteúdo de arquivos externos (como .h de bibliotecas ou configurações de hardware) diretamente no código.</li>
+                <li><strong>#ifdef / #ifndef (Compilação Condicional):</strong> Avaliam se uma macro foi definida ou não, permitindo que blocos inteiros de código sejam incluídos ou removidos do programa final. Isso é vital para criar diferentes versões do mesmo código base, ativando funcionalidades apenas quando o hardware suportar, economizando memória do sistema embarcado.</li>
+            </ul>
+            
+            <div class="callout callout-info">
+                <p><strong>Integração Prática (Metodologia PBL):</strong></p>
+                <p>O ensino das macros é fundamental na programação de robôs. Por exemplo, usar #define PINO_MOTOR 9 ao invés de usar uma variável int tradicional preserva a escassa memória SRAM do Arduino e facilita a legibilidade e a manutenção do hardware do projeto.</p>
+            </div>
+<pre><code>#define PINO_LED 13 // Substituição textual; não ocupa SRAM
+#define MODO_DEBUG  // Define uma macro para ativar o modo de depuração
+
+void setup() {
+  pinMode(PINO_LED, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+#ifdef MODO_DEBUG
+  // Compilado e enviado para a placa apenas se MODO_DEBUG estiver definido
+  Serial.println("Executando loop de controle...");
+#endif
+}</code></pre>
+        </section>
+    </main>
+
+    <!-- Rodapé -->
+    <footer>
+        <p>&copy; SENAI — Serviço Nacional de Aprendizagem Industrial. Todos os direitos reservados.</p>
+    </footer>
+
+    <!-- Scripts JavaScript -->
+    <script>
+        console.log("Página da Aula 06 carregada com sucesso!");
+    </script>
+
+</body>
+</html>
