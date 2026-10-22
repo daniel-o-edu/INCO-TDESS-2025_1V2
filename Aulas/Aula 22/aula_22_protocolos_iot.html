@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aula 22 - Protocolos IoT MQTT/OPC e Web</title>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      background-color: #f4f6f8;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background-color: #1e293b;
+      color: #ffffff;
+      padding: 1.2rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .header-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .header-title h2 {
+      font-size: 1.25rem;
+      margin-bottom: 0.2rem;
+      color: #38bdf8;
+    }
+
+    .header-title span {
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.2rem;
+    }
+
+    nav a {
+      color: #e2e8f0;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: color 0.3s ease;
+    }
+
+    nav a:hover {
+      color: #38bdf8;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      flex: 1;
+      width: 100%;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 2rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      color: #0f172a;
+      margin-bottom: 0.75rem;
+    }
+
+    h2 {
+      font-size: 1.4rem;
+      color: #1e293b;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 0.4rem;
+    }
+
+    h3 {
+      font-size: 1.15rem;
+      color: #0369a1;
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    p {
+      margin-bottom: 1rem;
+      color: #475569;
+    }
+
+    ul, ol {
+      margin-bottom: 1rem;
+      padding-left: 1.5rem;
+      color: #475569;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.5rem;
+      background-color: #fff;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border: 1px solid #e2e8f0;
+    }
+
+    th {
+      background-color: #1e293b;
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    code {
+      background-color: #f1f5f9;
+      color: #0f172a;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 0.9em;
+    }
+
+    pre {
+      background-color: #0f172a;
+      color: #f8fafc;
+      padding: 1.2rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 1.2rem;
+    }
+
+    pre code {
+      background-color: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    .callout {
+      background-color: #f0f9ff;
+      border-left: 4px solid #0284c7;
+      padding: 1rem 1.25rem;
+      border-radius: 4px;
+      margin-bottom: 1.5rem;
+    }
+
+    .callout p:last-child {
+      margin-bottom: 0;
+    }
+
+    .callout-warning {
+      background-color: #fffbeb;
+      border-left-color: #f59e0b;
+    }
+
+    .callout-info {
+      background-color: #f0fdf4;
+      border-left-color: #16a34a;
+    }
+
+    .btn {
+      display: inline-block;
+      background-color: #0284c7;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #0369a1;
+    }
+
+    footer {
+      background-color: #1e293b;
+      color: #94a3b8;
+      text-align: center;
+      padding: 1.5rem;
+      margin-top: auto;
+    }
+
+    footer p {
+      color: #94a3b8;
+      margin-bottom: 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <div class="header-title">
+        <h2>SENAI — Serviço Nacional de Aprendizagem Industrial</h2>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="#introducao-protocolos">Introdução</a></li>
+          <li><a href="#arquitetura-pubsub">Arquitetura Pub/Sub</a></li>
+          <li><a href="#mecanismos-resiliencia">Resiliência e Segurança</a></li>
+          <li><a href="#simulacao-protocolos">Simulação Prática</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="card">
+      <h1>Aula 22 - Protocolos IoT MQTT/OPC e Web</h1>
+      <p><strong>Descrição:</strong> A aula apresenta os fundamentos e a arquitetura do protocolo IoT MQTT, detalhando seu modelo de publicação/assinatura, níveis de serviço (QoS), mecanismos de segurança e um roteiro prático de simulação.</p>
+    </section>
+
+    <section id="introducao-protocolos" class="card">
+      <h2>1. Introdução aos Protocolos IoT e Comunicação Web</h2>
+      
+      <h3>Conceito de Protocolos Leves para IoT</h3>
+      <p>O MQTT (Message Queuing Telemetry Transport) é um protocolo de comunicação de padrão aberto, leve e eficiente. Ele foi especificamente projetado para operar em ambientes com recursos limitados, destacando-se em redes que apresentam baixa largura de banda, alta latência ou conectividade intermitente e instável. Desenvolvido inicialmente pela IBM nos anos 1990, o protocolo baseia-se em um modelo cliente/servidor sobre o TCP/IP usual e utiliza o paradigma assíncrono Publish/Subscribe (Publicar/Assinar), sendo orientado a eventos. Nesse modelo, os dispositivos atuam como clientes e se conectam a um servidor central, o broker, que é responsável por gerenciar a comunicação e os tópicos.</p>
+      
+      <h3>Comparativo de Protocolos (MQTT vs. HTTP vs. CoAP)</h3>
+      <p>Estabelecemos as seguintes diferenças entre os protocolos:</p>
+      <ul>
+        <li><strong>Modelo de comunicação:</strong> O MQTT utiliza um modelo assíncrono de Publish/Subscribe (Publicação/Assinatura). O HTTP funciona em um modelo síncrono de Cliente-Servidor baseado em requisição-resposta. Já o CoAP opera em um modelo Cliente-Servidor assíncrono, também baseado em requisição-resposta.</li>
+        <li><strong>Eficiência de banda e tamanho de payload:</strong> O MQTT possui alta eficiência de banda, operando com mensagens compactas e cabeçalhos mínimos. O HTTP apresenta uma eficiência moderada a baixa devido à presença de cabeçalhos pesados, dificultando o uso em redes restritas. O CoAP possui alta eficiência e foi projetado para mensagens pequenas em redes restritas.</li>
+        <li><strong>Consumo de energia:</strong> O MQTT apresenta baixo consumo de energia, sendo otimizado para dispositivos IoT alimentados por bateria. O HTTP possui um alto consumo de energia, uma vez que suas conexões frequentes exigem mais recursos. O CoAP tem um consumo de energia muito baixo, sendo ideal para dispositivos com restrições extremas de energia.</li>
+      </ul>
+
+      <h3>Visão Geral de Padrões Industriais</h3>
+      <p>O MQTT tornou-se um padrão amplamente adotado em aplicações de IoT, sistemas distribuídos e monitoramento industrial. Na arquitetura moderna da Indústria 4.0, o MQTT atua como uma ponte crucial entre o chão de fábrica e os sistemas de Tecnologia da Informação (TI). Ele facilita a integração de dados coletados por sensores e PLCs com sistemas SCADA (Supervisory Control and Data Acquisition), permitindo que essas informações sejam enviadas de forma leve, resiliente e escalável para arquiteturas em nuvem.</p>
+      <p>Para garantir uma comunicação robusta na indústria, o MQTT é frequentemente utilizado ao lado do padrão OPC (Open Platform Communications), mais especificamente o OPC UA (Unified Architecture). Enquanto o MQTT resolve o problema de "como" transportar os dados de maneira eficiente e leve até a nuvem, o padrão OPC atua na interoperabilidade e modelagem da informação, garantindo que máquinas de diferentes fabricantes consigam se comunicar de forma padronizada. Em muitas arquiteturas industriais, o OPC UA é usado para organizar e estruturar os dados localmente, e o MQTT é empregado para publicar esses dados em sistemas remotos e plataformas em nuvem.</p>
+    </section>
+
+    <section id="arquitetura-pubsub" class="card">
+      <h2>2. Arquitetura Publish/Subscribe (MQTT)</h2>
+      
+      <h3>Fundamentos do Modelo Pub/Sub</h3>
+      <p>A arquitetura do protocolo MQTT utiliza o paradigma Publish/Subscribe (Publicar/Assinar), caracterizando-se por ser um modelo orientado a eventos. Diferente do modelo tradicional de requisição-resposta, essa abordagem transforma a maneira como os nós da rede interagem, baseando-se em três componentes principais:</p>
+      <ul>
+        <li><strong>Componentes e papéis centrais:</strong>
+          <ul>
+            <li><strong>O Broker (Intermediário central):</strong> Atua como o servidor único da rede, sendo a entidade central responsável pelo gerenciamento dos tópicos e de toda a comunicação entre os dispositivos. O funcionamento do MQTT possui uma dependência fundamental desse broker.</li>
+            <li><strong>Publisher (Emissor):</strong> Consiste nos dispositivos conectados como clientes que geram e enviam os dados. Esses dispositivos publicam as suas mensagens direcionando-as a tópicos específicos no broker.</li>
+            <li><strong>Subscriber (Receptor):</strong> Consiste nos dispositivos clientes interessados em receber determinados dados. Eles passam a "ouvir" as mensagens de outros dispositivos após realizarem o processo de inscrição (subscribe) nos tópicos gerenciados pelo broker.</li>
+          </ul>
+        </li>
+        <li><strong>Desacoplamento espacial e temporal entre os clientes:</strong> O modelo Publish/Subscribe promove um alto nível de isolamento entre quem envia e quem recebe os dados, o que é conhecido como desacoplamento. Como todos os dispositivos se conectam unicamente ao broker e não diretamente entre si, temos:
+          <ul>
+            <li><strong>Desacoplamento Espacial:</strong> O Publisher e o Subscriber não precisam conhecer a existência, a localização na rede (IP) ou a identidade um do outro. A única entidade que ambos precisam conhecer e acessar é o servidor único (o broker).</li>
+            <li><strong>Desacoplamento Temporal:</strong> Embora o MQTT seja excelente para comunicação em tempo real, os emissores e receptores não precisam estar processando informações de forma síncrona. O gerenciamento das mensagens pelo broker garante que a publicação e o recebimento ocorram de forma independente e assíncrona.</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>Estrutura Hierárquica de Tópicos e Wildcards</h3>
+      <p>No protocolo MQTT, as mensagens não são enviadas diretamente de um nó para outro, mas sim direcionadas a "tópicos", que funcionam como endereços ou canais de comunicação gerenciados pelo broker.</p>
+      <ul>
+        <li><strong>Estrutura de Strings:</strong> Os tópicos são organizados em formato de árvore lógica, utilizando strings delimitadas pelo caractere de barra (/) para criar uma hierarquia simples e intuitiva.</li>
+        <li><strong>Exemplo Prático:</strong> Uma estrutura de tópicos bem definida em uma automação residencial pode seguir a taxonomia:
+          <ul>
+            <li><code>casa/sala/temperatura</code></li>
+            <li><code>casa/sala/umidade</code></li>
+            <li><code>casa/cozinha/luz</code></li>
+          </ul>
+        </li>
+        <li><strong>Sensibilidade a Maiúsculas:</strong> É importante destacar que os tópicos são case-sensitive (diferenciam maiúsculas de minúsculas). Portanto, <code>casa/sala/temperatura</code> e <code>Casa/Sala/Temperatura</code> representam canais totalmente distintos no broker.</li>
+      </ul>
+
+      <h3>Uso de Wildcards para Subscrição Flexível</h3>
+      <p>Para evitar que um cliente precise se inscrever individualmente em dezenas ou centenas de tópicos específicos, o MQTT oferece o recurso de wildcards (caracteres coringa). Eles só podem ser utilizados no processo de inscrição (subscription), sendo proibidos durante a publicação de mensagens.</p>
+      <ol>
+        <li><strong>Wildcard de Nível Único (+):</strong>
+          <ul>
+            <li>Substitui exatamente um único nível da hierarquia de tópicos.</li>
+            <li>Exemplo: Ao se inscrever no tópico <code>casa/+/temperatura</code>, o cliente receberá mensagens de:
+              <ul>
+                <li><code>casa/sala/temperatura</code></li>
+                <li><code>casa/cozinha/temperatura</code></li>
+                <li><code>casa/quarto/temperatura</code></li>
+              </ul>
+            </li>
+            <li>Nota: Ele não responderá a <code>casa/temperatura</code> ou <code>casa/primeiro-andar/sala/temperatura</code>, pois substitui estritamente apenas um nível entre as barras.</li>
+          </ul>
+        </li>
+        <li><strong>Wildcard de Múltiplos Níveis (#):</strong>
+          <ul>
+            <li>Substitui qualquer número de níveis subsequentes na hierarquia de tópicos.</li>
+            <li>Regra de Uso: Deve sempre ser posicionado no final da string do tópico e ser precedido por uma barra / (ou ser usado sozinho).</li>
+            <li>Exemplo: Ao se inscrever no tópico <code>casa/sala/#</code>, o cliente receberá qualquer publicação que comece com o caminho especificado:
+              <ul>
+                <li><code>casa/sala/temperatura</code></li>
+                <li><code>casa/sala/iluminacao/lustre</code></li>
+                <li><code>casa/sala/ar-condicionado/status/erro</code></li>
+              </ul>
+            </li>
+            <li>Se um cliente se inscrever no tópico raiz <code>#</code>, ele passará a receber todas as mensagens que trafegam por aquele broker (útil para auditoria, dashboards ou gravação em banco de dados).</li>
+          </ul>
+        </li>
+      </ol>
+
+      <h3>Níveis de Qualidade de Serviço (QoS)</h3>
+      <p>No protocolo MQTT, a Qualidade de Serviço (QoS) tem um significado diferente das redes de roteadores tradicionais. Em vez de lidar com filas e priorização de tráfego, o QoS no MQTT define o nível de garantia de entrega de uma mensagem entre o cliente (publisher ou subscriber) e o broker. O MQTT possui três níveis exatos de QoS, equilibrando confiabilidade e consumo de recursos:</p>
+      <ul>
+        <li><strong>QoS 0: No máximo uma vez (At most once)</strong>
+          <ul>
+            <li><strong>Como funciona:</strong> É o modelo "dispara e esquece" (fire and forget). O remetente envia a mensagem apenas uma vez e não exige nenhuma confirmação de recebimento do broker.</li>
+            <li><strong>Características:</strong> É o nível mais rápido, que consome menos banda e bateria, mas não oferece nenhuma garantia. Se a conexão falhar no momento do envio, a mensagem é perdida.</li>
+            <li><strong>Uso ideal:</strong> Dados não críticos que são atualizados com alta frequência, onde perder uma amostra não importa (ex: um sensor de temperatura que envia leituras a cada 2 segundos).</li>
+          </ul>
+        </li>
+        <li><strong>QoS 1: Pelo menos uma vez (At least once)</strong>
+          <ul>
+            <li><strong>Como funciona:</strong> Garante que a mensagem chegará ao destino, mas pode resultar em entregas duplicadas. O remetente guarda a mensagem e continua reenviando-a até receber um pacote de confirmação (PUBACK) do receptor.</li>
+            <li><strong>Características:</strong> Consome um pouco mais de banda e recursos. Se houver lentidão na rede e o PUBACK demorar a chegar, o remetente reenvia o pacote, fazendo com que o broker (ou cliente) receba a mesma mensagem mais de uma vez.</li>
+            <li><strong>Uso ideal:</strong> Sistemas onde perder a informação é inaceitável, mas a aplicação final consegue lidar com dados duplicados sem gerar erros (operações idempotentes, como "ligar luz", onde receber o comando "ligar" duas vezes não muda o estado final).</li>
+          </ul>
+        </li>
+        <li><strong>QoS 2: Exatamente uma vez (Exactly once)</strong>
+          <ul>
+            <li><strong>Como funciona:</strong> É o nível mais alto, mais seguro e também o mais lento. Utiliza um processo de confirmação em quatro etapas (4-way handshake: PUBLISH, PUBREC, PUBREL, PUBCOMP) para garantir que a mensagem chegue uma única vez, sem perdas e sem duplicatas.</li>
+            <li><strong>Características:</strong> Consome significativamente mais banda e aumenta a latência da comunicação.</li>
+            <li><strong>Uso ideal:</strong> Comandos críticos ou sistemas onde uma duplicidade causaria problemas graves e cumulativos (ex: cobrança financeira, sistema de contagem, acionamento crítico de uma máquina).</li>
+          </ul>
+        </li>
+      </ul>
+      <p>Detalhe importante de arquitetura: O QoS no MQTT é negociado em duas etapas separadas:</p>
+      <ol>
+        <li>Do dispositivo que publica (Publisher) para o Broker.</li>
+        <li>Do Broker para o dispositivo que assina o tópico (Subscriber).</li>
+      </ol>
+      <p>O nível de QoS final, de ponta a ponta, será sempre limitado ao menor nível de QoS configurado entre essas duas conexões. Se um dispositivo publicar em QoS 2, mas o assinante estiver configurado para receber em QoS 0, a entrega final para esse assinante será em QoS 0.</p>
+    </section>
+
+    <section id="mecanismos-resiliencia" class="card">
+      <h2>3. Mecanismos de Resiliência e Segurança</h2>
+      
+      <h3>Recurso Last Will and Testament (LWT)</h3>
+      <p>O Last Will and Testament (Testamento e Última Vontade) é um recurso fundamental de resiliência no MQTT, concebido para mitigar problemas em conectividades intermitentes. O broker MQTT rastreia ativamente os clientes conectados à rede utilizando um sistema de mensagens de keep-alive. Ao se conectar ao servidor, um dispositivo pode registrar antecipadamente uma mensagem de "testamento" vinculada a um tópico específico. Caso o dispositivo sofra uma desconexão abrupta e não intencional (como perda de bateria, rompimento de cabo ou falha de rede) e pare de enviar os pacotes keep-alive, o broker detecta a falha e publica automaticamente a mensagem LWT registrada. Isso garante que o restante do sistema, como painéis de monitoramento ou sistemas de alarme, seja imediatamente notificado sobre a indisponibilidade repentina do nó.</p>
+
+      <h3>Segurança em Camadas</h3>
+      <p>O protocolo MQTT foi projetado visando a máxima eficiência de processamento e consumo de banda, o que significa que ele não possui criptografia de dados habilitada por padrão. Para garantir implementações seguras em IoT, adota-se um modelo de segurança baseado em camadas:</p>
+      <ul>
+        <li><strong>Autenticação por Usuário e Senha:</strong> O servidor MQTT atua como o hub central responsável pela autenticação e autorização dos clientes MQTT. A primeira etapa obrigatória para que qualquer dispositivo possa atuar como emissor (publisher) ou receptor (subscriber) é estabelecer a conexão fornecendo credenciais válidas ao servidor.</li>
+        <li><strong>Criptografia na Camada de Transporte (TLS/SSL):</strong> Como o protocolo MQTT é executado sobre a pilha TCP/IP, a proteção contra interceptação de dados (ataques man-in-the-middle) é feita criptografando o canal de comunicação na camada de transporte. A aplicação de TLS/SSL gera o que convencionalmente chamamos de MQTTS (MQTT over TLS), garantindo a confidencialidade e a integridade da carga útil (payload) das mensagens durante a transmissão.</li>
+        <li><strong>Controle de Acesso via ACLs (Access Control Lists):</strong> Após a etapa de autenticação, o servidor MQTT precisa gerenciar a autorização dos dispositivos conectados. As Listas de Controle de Acesso (ACLs) definem permissões granulares, determinando exatamente quais tópicos cada usuário pode acessar, bem como o tipo de operação permitida (leitura/assinatura ou escrita/publicação). Isso garante, por exemplo, que um simples sensor de umidade tenha permissão apenas para publicar em seu tópico específico, impossibilitando-o de enviar comandos críticos para o sistema de refrigeração.</li>
+      </ul>
+    </section>
+
+    <section id="simulacao-protocolos" class="card">
+      <h2>4. Simulação de Protocolos MQTT/OPC</h2>
+
+      <h3>Passo 1: Configurar a Conexão com o Broker</h3>
+      <ol>
+        <li>Abra o MQTT.fx.</li>
+        <li>Clique no ícone de engrenagem (ao lado do botão Connect).</li>
+        <li>Clique no botão + (canto inferior esquerdo) para criar um novo perfil.</li>
+        <li>Preencha os campos com as seguintes informações:
+          <ul>
+            <li>Profile Name: Broker Publico HiveMQ</li>
+            <li>Broker Address: broker.hivemq.com</li>
+            <li>Broker Port: 1883</li>
+          </ul>
+        </li>
+        <li>Clique em Apply e depois em OK.</li>
+        <li>Na tela principal, certifique-se de que o perfil criado está selecionado e clique em Connect. O indicador redondo no canto superior direito deverá ficar verde, confirmando a conexão.</li>
+      </ol>
+
+      <h3>Passo 2: Inscrever-se em um Tópico (Subscribe)</h3>
+      <p>Antes de enviar uma mensagem, precisamos de alguém para escutá-la. Vamos simular um dispositivo receptor (como um painel de controle ou um aplicativo).</p>
+      <ol>
+        <li>Clique na aba Subscribe (Inscrição).</li>
+        <li>No campo de texto, digite um tópico exclusivo para evitar misturar com mensagens de outros usuários do broker público. Exemplo: <code>meuteste/mqtt/sensor1</code></li>
+        <li>Clique no botão Subscribe à direita.</li>
+        <li>O tópico aparecerá na lista logo abaixo, indicando que o MQTT.fx está "ouvindo" esse canal.</li>
+      </ol>
+
+      <h3>Passo 3: Publicar uma Mensagem (Publish)</h3>
+      <p>Agora vamos simular um dispositivo transmissor (como um sensor de temperatura).</p>
+      <ol>
+        <li>Clique na aba Publish (Publicação).</li>
+        <li>No campo de texto do tópico, insira exatamente o mesmo tópico que você escolheu no Passo 2: <code>meuteste/mqtt/sensor1</code></li>
+        <li>No campo de texto grande abaixo (área da mensagem/payload), digite um dado em formato JSON ou texto simples. Exemplo:
+<pre><code>{
+  "temperatura": 24.5,
+  "status": "normal"
+}</code></pre>
+        </li>
+        <li>Use o código com cuidado.</li>
+        <li>Clique no botão Publish.</li>
+      </ol>
+
+      <h3>Passo 4: Verificar o Recebimento</h3>
+      <ol>
+        <li>Volte para a aba Subscribe.</li>
+        <li>Olhe para o lado direito da tela. Você verá a mensagem enviada, acompanhada da data/hora e do tópico correspondente.</li>
+      </ol>
+
+      <div class="callout callout-info">
+        <p><strong>Desafio Extra: Entendendo o desacoplamento do MQTT</strong></p>
+        <p>Para fixar o aprendizado, faça o seguinte teste:</p>
+        <ol>
+          <li>Vá na aba Subscribe e clique em Unsubscribe para cancelar a inscrição.</li>
+          <li>Vá na aba Publish e mude o valor da temperatura para 30.0. Clique em Publish.</li>
+          <li>Volte na aba Subscribe e observe que nada foi recebido (já que você não estava inscrito no momento do envio). O MQTT funciona em tempo real e não armazena mensagens por padrão (a menos que configurado com Retained Messages ou QoS 1/2 com sessões persistentes).</li>
+        </ol>
+      </div>
+
+      <div class="callout callout-info">
+        <p><strong>Dinâmica em grupo</strong></p>
+        <p>Para que os colegas de sala consigam se inscrever nos tópicos uns dos outros, o segredo está na padronização dos nomes dos tópicos. Como todos estão conectados ao mesmo broker público (broker.hivemq.com), qualquer pessoa na sala pode ouvir ou falar com qualquer colega, desde que saiba o nome exato do canal. Aqui está como configurar essa dinâmica em grupo:</p>
+        
+        <p><strong>1. Criem um Padrão de Tópico para a Sala</strong></p>
+        <p>Para evitar que mensagens de desconhecidos na internet entrem no exercício, combinem uma estrutura única. Por exemplo: <code>sala3a/nome_do_aluno/sensor</code></p>
+        
+        <p><strong>2. Exemplo Prático de Interação (Aluno A e Aluno B)</strong></p>
+        <p>Imaginem que o Aluno A se chama Carlos e o Aluno B se chama Mariana.</p>
+        <p>O que o Carlos (Aluno A) faz:</p>
+        <ol>
+          <li>Vai na aba Publish.</li>
+          <li>Digita o tópico dele: <code>sala3a/carlos/temperatura</code></li>
+          <li>Digita a mensagem: <code>{"temp": 22}</code> e clica em Publish.</li>
+        </ol>
+        <p>O que a Mariana (Aluno B) faz para ouvir o Carlos:</p>
+        <ol>
+          <li>Vai na aba Subscribe.</li>
+          <li>Digita exatamente o tópico do Carlos: <code>sala3a/carlos/temperatura</code></li>
+          <li>Clica em Subscribe. Pronto, ela verá as mensagens que o Carlos enviar.</li>
+        </ol>
+
+        <p><strong>3. O "Modo Professor" (Ouvir a sala toda de uma vez)</strong></p>
+        <p>Se você ou algum colega quiser receber as mensagens de todos os alunos da sala ao mesmo tempo, o MQTT permite o uso de um caractere curinga chamado Wildcard (#).</p>
+        <ol>
+          <li>Vá na aba Subscribe.</li>
+          <li>Digite o tópico usando a hashtag no final: <code>sala3a/#</code></li>
+          <li>Clique em Subscribe.</li>
+        </ol>
+        <p>O símbolo # diz ao broker: "Me envie qualquer mensagem que comece com sala3a/, não importa o que venha depois". Assim, você verá as publicações do Carlos, da Mariana e de qualquer outro colega instantaneamente.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; SENAI — Serviço Nacional de Aprendizagem Industrial.</p>
+  </footer>
+
+  <script>
+    console.log("Página da Aula 22 carregada com sucesso!");
+  </script>
+</body>
+</html>
